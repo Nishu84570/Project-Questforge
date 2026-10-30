@@ -1,0 +1,78 @@
+/* Streak and Quest Container */
+.streak-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: #12141c;
+  border-radius: 12px;
+  color: #ffffff;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid #1f2430;
+}
+
+.streak-container h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #f3f4f6;
+  border-bottom: 2px solid #1f2430;
+  padding-bottom: 0.75rem;
+}
+
+/* Cards Styling */
+.streak-card,
+.quest-card {
+  background-color: #1a1f2c;
+  padding: 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #2a3245;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.streak-card:hover,
+.quest-card:hover {
+  border-color: #4f46e5;
+  transform: translateY(-2px);
+}
+
+.streak-card h3,
+.quest-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #818cf8;
+}
+
+/* Text and Status styling */
+.streak-card p,
+.quest-card p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  color: #cbd5e1;
+}
+
+.streak-card strong,
+.quest-card strong {
+  color: #ffffff;
+}
+
+/* Loading and Error States */
+.streak-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.streak-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.95rem;
+}

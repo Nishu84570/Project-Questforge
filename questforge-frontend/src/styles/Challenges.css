@@ -1,0 +1,106 @@
+/* Page Wrapper */
+.page.challenges-page {
+  padding: 32px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #f3f4f6;
+}
+
+/* Header Actions */
+.challenges-header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Filters Card */
+.challenge-filters-card {
+  background: rgba(20, 20, 30, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 28px;
+  backdrop-filter: blur(12px);
+}
+
+.challenge-filters {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.challenge-search-input {
+  flex: 1;
+  min-width: 240px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f3f4f6;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.challenge-search-input:focus {
+  border-color: rgba(99, 102, 241, 0.6);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+}
+
+.challenge-select {
+  min-width: 160px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f3f4f6;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.challenge-select option {
+  background: #12121a;
+  color: #f3f4f6;
+}
+
+/* Results Info Count Bar */
+.challenge-results-info {
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+.challenge-results-info strong {
+  color: #ffffff;
+}
+
+/* Challenge Card Wrapper & Leaderboard Button */
+.challenge-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.leaderboard-card-button {
+  width: 100%;
+  text-align: center;
+  justify-content: center;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  font-size: 0.85srem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.leaderboard-card-button:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
