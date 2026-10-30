@@ -1,0 +1,8 @@
+# Node / Frontend
+node_modules/
+dist/
+
+# Java / Maven
+target/
+*.class
+.mvn/
