@@ -1,0 +1,41 @@
+/* Page Wrapper */
+.page.admin-analytics-page {
+  padding: 32px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #f3f4f6;
+}
+
+/* Header Action Group */
+.header-action-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Error Card Customization */
+.error-card-container {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+  margin-bottom: 24px;
+}
+
+/* Analytics Field Cards inside Backend Response */
+.analytics-field-card {
+  word-break: break-word;
+}
+
+.analytics-field-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 8px 0 0 0;
+}
+
+/* Navigation Modules Group */
+.navigation-modules-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}

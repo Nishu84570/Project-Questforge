@@ -1,0 +1,29 @@
+/* Page Wrapper */
+.page.admin-overview-page {
+  padding: 32px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #f3f4f6;
+}
+
+/* Header Action Group */
+.header-action-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Error Card Customization */
+.error-card-container {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+  margin-bottom: 24px;
+}
+
+/* Quick Actions Group */
+.quick-actions-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}

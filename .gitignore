@@ -1,0 +1,24 @@
+# Node dependencies
+node_modules/
+
+# Frontend build
+dist/
+
+# Java / Maven build
+target/
+*.class
+
+# Environment variables
+.env
+.env.*
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
