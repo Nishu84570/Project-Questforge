@@ -130,10 +130,12 @@ QuestForge follows a **full-stack client-server architecture**.
 ---
 
 # 📁 Project Structure
+```text
 
 QuestForge/
 │
 ├── src/
+│   │
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── questforge/
@@ -167,7 +169,44 @@ QuestForge/
 │   │   │       │   └── WeeklyQuestController.java
 │   │   │       │
 │   │   │       ├── dto/
-│   │   │       │   └── ... DTO classes
+│   │   │       │   ├── AchievementResponseDTO.java
+│   │   │       │   ├── AdminChallengeOverviewDTO.java
+│   │   │       │   ├── AdminDashboardResponseDTO.java
+│   │   │       │   ├── AdminSubmissionResponseDTO.java
+│   │   │       │   ├── AdminSubmissionStatusRequestDTO.java
+│   │   │       │   ├── AdminUserResponseDTO.java
+│   │   │       │   ├── AdminUserRoleRequestDTO.java
+│   │   │       │   ├── AdminUserXpRequestDTO.java
+│   │   │       │   ├── AnswerRequestDTO.java
+│   │   │       │   ├── AnswerResponseDTO.java
+│   │   │       │   ├── AttemptRequestDTO.java
+│   │   │       │   ├── AttemptResponseDTO.java
+│   │   │       │   ├── ChallengeAnalyticsResponseDTO.java
+│   │   │       │   ├── ChallengeRequestDTO.java
+│   │   │       │   ├── ChallengeResponseDTO.java
+│   │   │       │   ├── DailyQuestResponseDTO.java
+│   │   │       │   ├── GlobalLeaderboardEntryDTO.java
+│   │   │       │   ├── LeaderboardEntryDTO.java
+│   │   │       │   ├── LeaderboardResponseDTO.java
+│   │   │       │   ├── LoginRequestDTO.java
+│   │   │       │   ├── LoginResponseDTO.java
+│   │   │       │   ├── NotificationBroadcastRequestDTO.java
+│   │   │       │   ├── NotificationResponseDTO.java
+│   │   │       │   ├── OptionRequestDTO.java
+│   │   │       │   ├── OptionResponseDTO.java
+│   │   │       │   ├── ProfileProgressDTO.java
+│   │   │       │   ├── ProfileUpdateRequestDTO.java
+│   │   │       │   ├── QuestionRequestDTO.java
+│   │   │       │   ├── QuestionResponseDTO.java
+│   │   │       │   ├── SubmissionAnswerDTO.java
+│   │   │       │   ├── SubmissionRequestDTO.java
+│   │   │       │   ├── SubmissionResponseDTO.java
+│   │   │       │   ├── SubmissionStatusRequestDTO.java
+│   │   │       │   ├── UserProfileDTO.java
+│   │   │       │   ├── UserRequestDTO.java
+│   │   │       │   ├── UserResponseDTO.java
+│   │   │       │   ├── UserUpdateRequestDTO.java
+│   │   │       │   └── WeeklyQuestResponseDTO.java
 │   │   │       │
 │   │   │       ├── exception/
 │   │   │       │   ├── GlobalExceptionHandler.java
@@ -188,7 +227,18 @@ QuestForge/
 │   │   │       │   └── WeeklyQuest.java
 │   │   │       │
 │   │   │       ├── repository/
-│   │   │       │   └── ... Repository classes
+│   │   │       │   ├── AchievementRepository.java
+│   │   │       │   ├── AnswerRepository.java
+│   │   │       │   ├── AttemptRepository.java
+│   │   │       │   ├── ChallengeRepository.java
+│   │   │       │   ├── DailyQuestRepository.java
+│   │   │       │   ├── NotificationRepository.java
+│   │   │       │   ├── OptionRepository.java
+│   │   │       │   ├── QuestionRepository.java
+│   │   │       │   ├── SubmissionRepository.java
+│   │   │       │   ├── UserRepository.java
+│   │   │       │   ├── UserStreakRepository.java
+│   │   │       │   └── WeeklyQuestRepository.java
 │   │   │       │
 │   │   │       ├── service/
 │   │   │       │   ├── AchievementService.java
@@ -216,10 +266,81 @@ QuestForge/
 │   └── test/
 │       └── java/
 │           └── questforge/
+│               │
+│               ├── controller/
+│               │   ├── AchievementControllerTest.java
+│               │   ├── AdminChallengeOverviewControllerTest.java
+│               │   ├── AdminDashboardControllerTest.java
+│               │   ├── AdminSubmissionControllerTest.java
+│               │   ├── AdminUserControllerTest.java
+│               │   ├── AnswerControllerTest.java
+│               │   ├── AttemptControllerTest.java
+│               │   ├── AuthControllerTest.java
+│               │   ├── ChallengeAnalyticsControllerTest.java
+│               │   ├── ChallengeControllerTest.java
+│               │   ├── DailyQuestControllerTest.java
+│               │   ├── LeaderboardControllerTest.java
+│               │   ├── NotificationControllerTest.java
+│               │   ├── OptionControllerTest.java
+│               │   ├── ProfileControllerTest.java
+│               │   ├── QuestionControllerTest.java
+│               │   ├── StreakControllerTest.java
+│               │   ├── SubmissionControllerTest.java
+│               │   ├── UserControllerTest.java
+│               │   ├── UserProfileControllerTest.java
+│               │   ├── WeeklyQuestControllerTest.java
+│               │   └── XPControllerTest.java
+│               │
+│               ├── exception/
+│               │   ├── GlobalExceptionHandlerTest.java
+│               │   └── ResourceNotFoundExceptionTest.java
+│               │
+│               ├── repository/
+│               │   ├── AchievementRepositoryTest.java
+│               │   ├── AnswerRepositoryTest.java
+│               │   ├── AttemptRepositoryTest.java
+│               │   ├── ChallengeRepositoryTest.java
+│               │   ├── DailyQuestRepositoryTest.java
+│               │   ├── NotificationRepositoryTest.java
+│               │   ├── OptionRepositoryTest.java
+│               │   ├── QuestionRepositoryTest.java
+│               │   ├── SubmissionRepositoryTest.java
+│               │   ├── UserRepositoryTest.java
+│               │   ├── UserStreakRepositoryTest.java
+│               │   └── WeeklyQuestRepositoryTest.java
+│               │
+│               ├── service/
+│               │   ├── AchievementServiceTest.java
+│               │   ├── AdminChallengeOverviewServiceTest.java
+│               │   ├── AdminDashboardServiceTest.java
+│               │   ├── AdminSubmissionServiceTest.java
+│               │   ├── AdminUserServiceTest.java
+│               │   ├── AnswerServiceTest.java
+│               │   ├── AttemptServiceTest.java
+│               │   ├── AuthServiceTest.java
+│               │   ├── ChallengeAnalyticsServiceTest.java
+│               │   ├── ChallengesServiceTest.java
+│               │   ├── CustomUserDetailsServiceTest.java
+│               │   ├── DailyQuestServiceTest.java
+│               │   ├── JwtServiceTest.java
+│               │   ├── LeaderboardServiceTest.java
+│               │   ├── NotificationServiceTest.java
+│               │   ├── OptionServiceTest.java
+│               │   ├── ProfileServiceTest.java
+│               │   ├── QuestionServiceTest.java
+│               │   ├── StreakServiceTest.java
+│               │   ├── SubmissionServiceTest.java
+│               │   ├── UserProfileServiceTest.java
+│               │   ├── UserServiceTest.java
+│               │   ├── WeeklyQuestServiceTest.java
+│               │   └── XPServiceTest.java
+│               │
 │               └── QuestforgeApplicationTests.java
 │
 ├── questforge-frontend/
+│   │
 │   ├── src/
+│   │   │
 │   │   ├── components/
 │   │   │   ├── AchievementCard.jsx
 │   │   │   ├── AdminNotificationModal.jsx
@@ -253,10 +374,44 @@ QuestForge/
 │   │   │   ├── SubmissionResult.jsx
 │   │   │   └── Submissions.jsx
 │   │   │
+│   │   ├── styles/
+│   │   │   ├── AchievementCard.css
+│   │   │   ├── Achievements.css
+│   │   │   ├── AdminChallengeOverview.css
+│   │   │   ├── AdminDashboard.css
+│   │   │   ├── AdminDashboardAnalytics.css
+│   │   │   ├── AdminDashboardOverview.css
+│   │   │   ├── AdminNotificationLink.css
+│   │   │   ├── AdminNotifications.css
+│   │   │   ├── AdminQuickLinks.css
+│   │   │   ├── AdminSubmissions.css
+│   │   │   ├── AdminUsers.css
+│   │   │   ├── AdminUserSubmissions.css
+│   │   │   ├── ChallengeAnalytics.css
+│   │   │   ├── ChallengeCard.css
+│   │   │   ├── Challenges.css
+│   │   │   ├── Home.css
+│   │   │   ├── Leaderboard.css
+│   │   │   ├── Login.css
+│   │   │   ├── Navbar.css
+│   │   │   ├── NotificationBell.css
+│   │   │   ├── Notifications.css
+│   │   │   ├── Profile.css
+│   │   │   ├── Register.css
+│   │   │   ├── SolveChallenge.css
+│   │   │   ├── Streak.css
+│   │   │   ├── StreakCalendar.css
+│   │   │   ├── SubmissionCard.css
+│   │   │   ├── SubmissionResult.css
+│   │   │   ├── Submissions.css
+│   │   │   └── ThemeToggle.css
+│   │   │
 │   │   ├── services/
 │   │   │   └── api.js
 │   │   │
 │   │   ├── utils/
+│   │   │   └── auth.js
+│   │   │
 │   │   ├── App.jsx
 │   │   ├── index.css
 │   │   └── main.jsx
@@ -271,7 +426,7 @@ QuestForge/
 ├── mvnw
 ├── mvnw.cmd
 └── README.md
-
+```
 
 # ⚙️ Prerequisites
 
