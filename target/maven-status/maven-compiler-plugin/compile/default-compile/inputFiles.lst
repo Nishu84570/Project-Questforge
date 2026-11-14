@@ -22,6 +22,7 @@ C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questfor
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\controller\UserController.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\controller\UserProfileController.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\controller\WeeklyQuestController.java
+C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\controller\XPController.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\dto\AchievementResponseDTO.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\dto\AdminChallengeOverviewDTO.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\dto\AdminDashboardResponseDTO.java
@@ -58,6 +59,7 @@ C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questfor
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\dto\UserProfileDTO.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\dto\UserRequestDTO.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\dto\UserResponseDTO.java
+C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\dto\UserUpdateRequestDTO.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\dto\WeeklyQuestResponseDTO.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\exception\GlobalExceptionHandler.java
 C:\Users\nikhi\OneDrive\Documents\Desktop\Java\questforge\src\main\java\questforge\exception\ResourceNotFoundException.java
