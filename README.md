@@ -15,7 +15,6 @@ The application uses **Java Spring Boot** for the backend REST API and **React +
 * 🔐 User registration and login
 * 🛡️ JWT-based authentication
 * 👤 User profile management
-* 🎯 Coding challenges
 * 🧩 Questions and multiple-choice options
 * 📝 Challenge attempts and submissions
 * 📊 Submission results and status tracking
