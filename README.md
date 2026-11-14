@@ -131,7 +131,6 @@ QuestForge follows a **full-stack client-server architecture**.
 
 # 📁 Project Structure
 
-```text
 QuestForge/
 │
 ├── src/
@@ -272,9 +271,7 @@ QuestForge/
 ├── mvnw
 ├── mvnw.cmd
 └── README.md
-```
 
----
 
 # ⚙️ Prerequisites
 
