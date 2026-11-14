@@ -1,141 +1,358 @@
-/* Base Card Layout */
+
 .challenge-card.achievement-card {
+  --accent: #818cf8;
+  --accent-light: #a5b4fc;
+  --surface: #11111d;
+  --text-primary: #f8fafc;
+  --text-secondary: #a1a1b5;
+
   position: relative;
-  width: 320px;
-  background: linear-gradient(145deg, rgba(22, 22, 32, 0.9), rgba(13, 13, 20, 0.95));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 24px;
+  isolation: isolate;
+  overflow: hidden;
+
+  width: min(100%, 340px);
+  min-height: 390px;
+  padding: 26px;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.5),
-              inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: #f3f4f6;
-  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse at 50% -20%,
+      rgba(99, 102, 241, 0.18),
+      transparent 65%
+    ),
+    linear-gradient(
+      145deg,
+      #191927 0%,
+      #11111d 50%,
+      #0b0b13 100%
+    );
+
+  border: 1px solid rgba(165, 180, 252, 0.15);
+  border-radius: 24px;
+
+  box-shadow:
+    0 20px 55px -20px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.025),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    box-shadow 0.4s ease;
 }
 
-/* Hover Floating Effect */
+/* Ambient Background Glow */
+
+.challenge-card.achievement-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+
+  width: 220px;
+  height: 220px;
+
+  top: -130px;
+  right: -90px;
+
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.22),
+    transparent 70%
+  );
+
+  filter: blur(20px);
+  pointer-events: none;
+  transition: transform 0.6s ease;
+}
+
+/* Premium Top Highlight */
+
+.challenge-card.achievement-card::after {
+  content: "";
+  position: absolute;
+
+  top: 0;
+  left: 15%;
+  width: 70%;
+  height: 1px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(199, 210, 254, 0.55),
+    transparent
+  );
+
+  pointer-events: none;
+}
+
+/* Hover Interaction */
+
 .challenge-card.achievement-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 20px 45px -15px rgba(99, 102, 241, 0.25),
-              inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-9px);
+
+  border-color: rgba(129, 140, 248, 0.45);
+
+  box-shadow:
+    0 30px 65px -20px rgba(79, 70, 229, 0.3),
+    0 12px 30px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.challenge-card.achievement-card:hover::before {
+  transform: scale(1.5);
 }
 
 /* Top Section */
+
 .challenge-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  gap: 10px;
 }
+
+/* Challenge ID */
 
 .challenge-id {
-  font-size: 0.75rem;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #9ca3af;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 4px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+
+  color: #c4c5d7;
+
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  padding: 6px 11px;
+  border-radius: 8px;
+
+  backdrop-filter: blur(10px);
 }
 
-/* Approved Status Badge */
+/* Approved Status */
+
 .submission-status.status-approved {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(16, 185, 129, 0.12);
-  color: #34d399;
+  justify-content: center;
+  gap: 7px;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+
+  padding: 6px 11px;
+  border-radius: 30px;
+
+  color: #6ee7b7;
+
+  background: rgba(16, 185, 129, 0.11);
   border: 1px solid rgba(52, 211, 153, 0.25);
+
+  box-shadow: 0 0 18px rgba(16, 185, 129, 0.07);
 }
 
-/* Icon Showcase Container */
+/* Icon Showcase */
+
 .achievement-icon-wrapper {
   position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 12px 0 20px 0;
-  height: 80px;
+
+  height: 100px;
+  margin: 8px 0 18px;
 }
+
+/* Animated Icon Glow */
 
 .icon-glow {
   position: absolute;
-  width: 65px;
-  height: 65px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(0, 0, 0, 0) 70%);
+
+  width: 100px;
+  height: 100px;
+
   border-radius: 50%;
-  z-index: 1;
-  filter: blur(8px);
+
+  background: radial-gradient(
+    circle,
+    rgba(129, 140, 248, 0.32) 0%,
+    rgba(99, 102, 241, 0.12) 40%,
+    transparent 72%
+  );
+
+  filter: blur(12px);
+
+  animation: achievementGlow 4s ease-in-out infinite;
 }
+
+/* Achievement Emoji */
 
 .achievement-emoji {
   position: relative;
-  font-size: 3.2rem;
   z-index: 2;
-  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.4));
-  transition: transform 0.3s ease;
+
+  font-size: 3.7rem;
+  line-height: 1;
+
+  filter:
+    drop-shadow(0 8px 12px rgba(0, 0, 0, 0.45))
+    drop-shadow(0 0 15px rgba(129, 140, 248, 0.2));
+
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.3s ease;
 }
 
 .challenge-card.achievement-card:hover .achievement-emoji {
-  transform: scale(1.1) rotate(5deg);
+  transform: translateY(-5px) scale(1.13) rotate(5deg);
+
+  filter:
+    drop-shadow(0 12px 16px rgba(0, 0, 0, 0.4))
+    drop-shadow(0 0 22px rgba(129, 140, 248, 0.35));
 }
 
-/* Title & Description */
+/* Title */
+
 .challenge-card.achievement-card h2 {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 750;
+  line-height: 1.35;
+
   color: #ffffff;
-  margin: 0 0 8px 0;
+
+  margin: 0 0 10px;
   text-align: center;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.035em;
+
+  text-shadow: 0 2px 15px rgba(255, 255, 255, 0.05);
 }
+
+/* Description */
 
 .challenge-card.achievement-card .description {
-  font-size: 0.875rem;
-  color: #9ca3af;
-  line-height: 1.5;
-  margin: 0 0 20px 0;
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.7;
+
+  color: var(--text-secondary);
+
+  margin: 0 0 24px;
   text-align: center;
 }
 
 /* Footer */
+
 .challenge-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 1.0);
-  border-top-color: rgba(255, 255, 255, 0.06);
-  font-size: 0.75rem;
-  font-weight: 500;
+  gap: 12px;
+
+  padding-top: 16px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+
+  font-size: 0.73rem;
+  font-weight: 600;
 }
+
+/* Achievement Code */
 
 .achievement-code-badge {
-  font-family: monospace;
-  color: #818cf8;
-  background: rgba(129, 140, 248, 0.1);
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.05em;
-  border: 1px solid rgba(129, 140, 248, 0.15);
+  display: inline-flex;
+  align-items: center;
+
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  color: #a5b4fc;
+
+  background: rgba(129, 140, 248, 0.10);
+  border: 1px solid rgba(129, 140, 248, 0.2);
+
+  padding: 5px 9px;
+  border-radius: 7px;
+
+  letter-spacing: 0.07em;
 }
 
+/* Brand */
+
 .brand-name {
-  color: #6b7280;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  color: #77788e;
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* Animations */
+
+@keyframes achievementGlow {
+  0%, 100% {
+    opacity: 0.65;
+    transform: scale(0.92);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 480px) {
+  .challenge-card.achievement-card {
+    width: 100%;
+    min-height: 370px;
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .achievement-emoji {
+    font-size: 3.3rem;
+  }
+
+  .challenge-card.achievement-card h2 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .challenge-card.achievement-card,
+  .achievement-emoji,
+  .icon-glow,
+  .challenge-card.achievement-card::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .challenge-card.achievement-card:hover {
+    transform: none;
+  }
 }

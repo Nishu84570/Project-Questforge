@@ -31,6 +31,6 @@ public class AchievementController {
         }
 
         return ResponseEntity.ok(
-                achievementService.getUserAchievements(authentication.getName()));
+            achievementService.getUserAchievements(authentication.getName()));
     }
 }

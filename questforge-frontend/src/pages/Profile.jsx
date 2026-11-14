@@ -1,10 +1,149 @@
-import React, { useEffect, useRef, useState } from 'react';
+
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Link } from 'react-router-dom';
+
 import { apiRequest } from '../services/api';
 import { getToken, getUser } from '../utils/auth';
+
 import '../styles/Profile.css';
 
+// ======================================================
+// CONFIGURATION
+// ======================================================
+
+const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
+const MAX_NAME_LENGTH = 100;
+const XP_PER_LEVEL = 500;
+
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+).replace(/\/+$/, '');
+
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+];
+
+// ======================================================
+// UTILITY FUNCTIONS
+// ======================================================
+
+const getSafeNumber = (value, fallback = 0) => {
+  const number = Number(value);
+
+  return Number.isFinite(number) ? number : fallback;
+};
+
+const getInitials = (name) => {
+  const normalizedName = String(name || '').trim();
+
+  if (!normalizedName) return 'U';
+
+  return normalizedName.charAt(0).toUpperCase();
+};
+
+const getProfileError = (data, fallback) => {
+  return data?.message || fallback;
+};
+
+const calculateProfileStats = (profile) => {
+  const totalAttempts = Math.max(
+    0,
+    getSafeNumber(profile.totalAttempts)
+  );
+
+  const correctAnswers = Math.max(
+    0,
+    getSafeNumber(profile.totalCorrectAnswers)
+  );
+
+  const questionsAttempted = Math.max(
+    0,
+    getSafeNumber(profile.totalQuestionsAttempted)
+  );
+
+  const averageScore = getSafeNumber(profile.averageScore);
+  const bestScore = getSafeNumber(profile.bestScore);
+
+  const accuracy = questionsAttempted > 0
+    ? Math.min(
+        100,
+        Math.round((correctAnswers / questionsAttempted) * 100)
+      )
+    : 0;
+
+  // Preserves the existing QuestForge XP calculation.
+  const xp = Math.max(0, totalAttempts * 25 + bestScore * 2);
+
+  const level = Math.floor(xp / XP_PER_LEVEL) + 1;
+  const levelXp = xp % XP_PER_LEVEL;
+
+  const xpPercentage = (levelXp / XP_PER_LEVEL) * 100;
+
+  return {
+    totalAttempts,
+    correctAnswers,
+    questionsAttempted,
+    averageScore,
+    bestScore,
+    accuracy,
+    xp,
+    level,
+    levelXp,
+    xpPercentage,
+    xpRemaining: XP_PER_LEVEL - levelXp,
+    firstAttempts: Math.max(
+      0,
+      getSafeNumber(profile.firstAttempts)
+    ),
+    practiceAttempts: Math.max(
+      0,
+      getSafeNumber(profile.practiceAttempts)
+    ),
+  };
+};
+
+const createAchievements = (stats) => [
+  {
+    id: 'first-mission',
+    icon: '🚀',
+    title: 'First Mission',
+    description: 'Completed your first challenge.',
+    unlocked: stats.totalAttempts >= 1,
+  },
+  {
+    id: 'persistent-coder',
+    icon: '🎯',
+    title: 'Persistent Coder',
+    description: 'Made at least two challenge attempts.',
+    unlocked: stats.totalAttempts >= 2,
+  },
+  {
+    id: 'score-hunter',
+    icon: '🏆',
+    title: 'Score Hunter',
+    description: 'Earned a score on a challenge.',
+    unlocked: stats.bestScore > 0,
+  },
+];
+
+// ======================================================
+// PROFILE COMPONENT
+// ======================================================
+
 function Profile() {
+  // ----------------------------------------------------
+  // STATE
+  // ----------------------------------------------------
+
   const [profile, setProfile] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -19,73 +158,143 @@ function Profile() {
   const [name, setName] = useState('');
 
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarVersion, setAvatarVersion] = useState(0);
+
+  // ----------------------------------------------------
+  // REFS
+  // ----------------------------------------------------
 
   const fileInputRef = useRef(null);
+  const avatarObjectUrlRef = useRef(null);
+  const profileRequestRef = useRef(null);
+
   const user = getUser();
 
-  
-  const fetchProfile = async () => {
+  const isBusy = savingName || uploadingImage || removingImage;
+
+  // ----------------------------------------------------
+  // AVATAR URL CLEANUP
+  // ----------------------------------------------------
+
+  const clearAvatarObjectUrl = useCallback(() => {
+    if (avatarObjectUrlRef.current) {
+      URL.revokeObjectURL(avatarObjectUrlRef.current);
+      avatarObjectUrlRef.current = null;
+    }
+  }, []);
+
+  // ----------------------------------------------------
+  // PROFILE FETCH
+  // ----------------------------------------------------
+
+  const fetchProfile = useCallback(async () => {
+    profileRequestRef.current?.abort();
+
+    const controller = new AbortController();
+    profileRequestRef.current = controller;
+
+    setLoading(true);
+    setError('');
+
     try {
-      setError('');
       const { response, data } = await apiRequest('/profile', {
         method: 'GET',
+        signal: controller.signal,
       });
 
+      if (controller.signal.aborted) return;
+
       if (!response.ok) {
-        setError(data?.message || 'Failed to load profile.');
+        setError(
+          getProfileError(data, 'Failed to load profile.')
+        );
         return;
       }
 
       setProfile(data);
-      setName(data.name || '');
+      setName(data?.name || '');
 
-      if (data.profileImagePresent) {
-        setAvatarUrl(`${window.location.origin}/api-profile-avatar`);
-      } else {
-        setAvatarUrl('');
-      }
     } catch (err) {
+      if (err.name === 'AbortError') return;
+
       console.error('Profile loading error:', err);
+
       setError('Unable to connect to QuestForge backend.');
+
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchProfile();
-  }, []);
 
-  
+    return () => {
+      profileRequestRef.current?.abort();
+      clearAvatarObjectUrl();
+    };
+  }, [fetchProfile, clearAvatarObjectUrl]);
+
+  // ----------------------------------------------------
+  // AVATAR FETCH
+  // ----------------------------------------------------
+
   useEffect(() => {
-    if (!profile?.profileImagePresent) {
-      setAvatarUrl('');
-      return;
-    }
-
-    const token = getToken();
-    if (!token) return;
+    let cancelled = false;
+    let currentObjectUrl = null;
 
     const controller = new AbortController();
 
     const loadAvatar = async () => {
+      setAvatarUrl('');
+
+      if (!profile?.profileImagePresent) {
+        return;
+      }
+
+      const token = getToken();
+
+      if (!token) {
+        return;
+      }
+
       try {
-        const response = await fetch('http://localhost:8080/profile/avatar', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/profile/avatar`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            signal: controller.signal,
+          }
+        );
 
         if (!response.ok) {
-          setAvatarUrl('');
+          if (!cancelled) {
+            console.error(
+              'Avatar request failed:',
+              response.status
+            );
+          }
+
           return;
         }
 
         const blob = await response.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        setAvatarUrl(objectUrl);
+
+        if (cancelled || !blob.size) return;
+
+        currentObjectUrl = URL.createObjectURL(blob);
+
+        avatarObjectUrlRef.current = currentObjectUrl;
+
+        if (!cancelled) {
+          setAvatarUrl(currentObjectUrl);
+        }
+
       } catch (err) {
         if (err.name !== 'AbortError') {
           console.error('Avatar loading error:', err);
@@ -96,13 +305,28 @@ function Profile() {
     loadAvatar();
 
     return () => {
+      cancelled = true;
       controller.abort();
-    };
-  }, [profile?.profileImagePresent]);
 
-  
+      if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
+
+        if (avatarObjectUrlRef.current === currentObjectUrl) {
+          avatarObjectUrlRef.current = null;
+        }
+      }
+    };
+  }, [profile?.profileImagePresent, avatarVersion]);
+
+  // ----------------------------------------------------
+  // PROFILE NAME UPDATE
+  // ----------------------------------------------------
+
   const handleSaveName = async (event) => {
     event.preventDefault();
+
+    if (isBusy) return;
+
     const trimmedName = name.trim();
 
     if (!trimmedName) {
@@ -110,8 +334,10 @@ function Profile() {
       return;
     }
 
-    if (trimmedName.length > 100) {
-      setError('Name cannot exceed 100 characters.');
+    if (trimmedName.length > MAX_NAME_LENGTH) {
+      setError(
+        `Name cannot exceed ${MAX_NAME_LENGTH} characters.`
+      );
       return;
     }
 
@@ -122,63 +348,105 @@ function Profile() {
     try {
       const { response, data } = await apiRequest('/profile', {
         method: 'PUT',
-        body: JSON.stringify({ name: trimmedName }),
+        body: JSON.stringify({
+          name: trimmedName,
+        }),
       });
 
       if (!response.ok) {
-        setError(data?.message || 'Failed to update your name.');
+        setError(
+          getProfileError(data, 'Failed to update your name.')
+        );
         return;
       }
 
-      setProfile(data);
-      setName(data.name || '');
+      setProfile((previous) => ({
+        ...previous,
+        ...data,
+      }));
 
+      const updatedName = data?.name ?? trimmedName;
+
+      setName(updatedName);
+
+      // Synchronize cached authentication information.
       const currentUser = getUser();
-      if (currentUser) {
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            ...currentUser,
-            name: data.name,
-          })
-        );
 
-        window.dispatchEvent(
-          new Event('questforge-auth-change')
-        );
+      if (currentUser) {
+        try {
+          localStorage.setItem(
+            'user',
+            JSON.stringify({
+              ...currentUser,
+              name: updatedName,
+            })
+          );
+
+          window.dispatchEvent(
+            new Event('questforge-auth-change')
+          );
+        } catch (storageError) {
+          console.error(
+            'Authentication cache update error:',
+            storageError
+          );
+        }
       }
 
       setEditMode(false);
       setMessage('Profile name updated successfully.');
+
     } catch (err) {
       console.error('Profile update error:', err);
+
       setError('Unable to connect to QuestForge backend.');
+
     } finally {
       setSavingName(false);
     }
   };
 
+  // ----------------------------------------------------
+  // AVATAR FILE SELECTION
+  // ----------------------------------------------------
+
   const handleAvatarButtonClick = () => {
-    if (uploadingImage) return;
+    if (isBusy) return;
+
     fileInputRef.current?.click();
   };
 
-  
+  // ----------------------------------------------------
+  // AVATAR UPLOAD
+  // ----------------------------------------------------
+
   const handleImageChange = async (event) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+
+    if (!file || isBusy) return;
 
     setError('');
     setMessage('');
 
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file.');
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setError(
+        'Please select a PNG, JPG, WEBP or GIF image.'
+      );
+
       event.target.value = '';
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Profile image must be smaller than 5 MB.');
+    if (file.size === 0) {
+      setError('The selected image is empty.');
+
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > MAX_AVATAR_SIZE) {
+      setError('Profile image must not exceed 5 MB.');
+
       event.target.value = '';
       return;
     }
@@ -187,38 +455,65 @@ function Profile() {
 
     try {
       const formData = new FormData();
+
       formData.append('file', file);
 
-      const { response, data } = await apiRequest('/profile/avatar', {
-        method: 'POST',
-        body: formData,
-      });
+      const { response, data } = await apiRequest(
+        '/profile/avatar',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
-        setError(data?.message || 'Failed to upload profile image.');
+        setError(
+          getProfileError(
+            data,
+            'Failed to upload profile image.'
+          )
+        );
+
         return;
       }
 
-      setProfile(data);
+      setProfile((previous) => ({
+        ...previous,
+        ...data,
+      }));
+
+      // Force the avatar loading effect to fetch the new image.
+      clearAvatarObjectUrl();
+      setAvatarUrl('');
+      setAvatarVersion((version) => version + 1);
+
       setMessage('Profile image updated successfully.');
+
     } catch (err) {
       console.error('Avatar upload error:', err);
+
       setError('Unable to upload profile image.');
+
     } finally {
       setUploadingImage(false);
+
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
     }
   };
 
-  
+  // ----------------------------------------------------
+  // AVATAR REMOVAL
+  // ----------------------------------------------------
+
   const handleRemoveImage = async () => {
-    if (!profile?.profileImagePresent) return;
+    if (!profile?.profileImagePresent || isBusy) return;
 
     const confirmed = window.confirm(
       'Are you sure you want to remove your profile image?'
     );
+
     if (!confirmed) return;
 
     setRemovingImage(true);
@@ -226,25 +521,48 @@ function Profile() {
     setMessage('');
 
     try {
-      const { response, data } = await apiRequest('/profile/avatar', {
-        method: 'DELETE',
-      });
+      const { response, data } = await apiRequest(
+        '/profile/avatar',
+        {
+          method: 'DELETE',
+        }
+      );
 
       if (!response.ok) {
-        setError(data?.message || 'Failed to remove profile image.');
+        setError(
+          getProfileError(
+            data,
+            'Failed to remove profile image.'
+          )
+        );
+
         return;
       }
 
-      setProfile(data);
+      clearAvatarObjectUrl();
       setAvatarUrl('');
+
+      setProfile((previous) => ({
+        ...previous,
+        ...data,
+        profileImagePresent: false,
+      }));
+
       setMessage('Profile image removed successfully.');
+
     } catch (err) {
       console.error('Avatar removal error:', err);
+
       setError('Unable to remove profile image.');
+
     } finally {
       setRemovingImage(false);
     }
   };
+
+  // ----------------------------------------------------
+  // EDIT HANDLERS
+  // ----------------------------------------------------
 
   const handleCancelEdit = () => {
     setName(profile?.name || '');
@@ -252,228 +570,498 @@ function Profile() {
     setError('');
   };
 
+  const handleStartEdit = () => {
+    setName(profile?.name || '');
+    setError('');
+    setMessage('');
+    setEditMode(true);
+  };
+
+  // ----------------------------------------------------
+  // DERIVED DATA
+  // ----------------------------------------------------
+
+  const stats = useMemo(() => {
+    if (!profile) return null;
+
+    return calculateProfileStats(profile);
+  }, [profile]);
+
+  const achievements = useMemo(() => {
+    if (!stats) return [];
+
+    return createAchievements(stats);
+  }, [stats]);
+
+  const unlockedAchievements = useMemo(
+    () => achievements.filter((item) => item.unlocked).length,
+    [achievements]
+  );
+
+  const displayName = (
+    profile?.name ||
+    user?.name ||
+    'User'
+  );
+
+  const initials = getInitials(displayName);
+
+  const statCards = useMemo(() => {
+    if (!stats) return [];
+
+    return [
+      {
+        icon: '🎯',
+        label: 'Total Attempts',
+        value: stats.totalAttempts,
+      },
+      {
+        icon: '🚀',
+        label: 'First Attempts',
+        value: stats.firstAttempts,
+      },
+      {
+        icon: '🔁',
+        label: 'Practice Attempts',
+        value: stats.practiceAttempts,
+      },
+      {
+        icon: '📊',
+        label: 'Average Score',
+        value: stats.averageScore,
+      },
+      {
+        icon: '🏆',
+        label: 'Best Score',
+        value: stats.bestScore,
+      },
+      {
+        icon: '✅',
+        label: 'Correct Answers',
+        value: stats.correctAnswers,
+      },
+      {
+        icon: '🧠',
+        label: 'Questions Attempted',
+        value: stats.questionsAttempted,
+      },
+      {
+        icon: '🎯',
+        label: 'Accuracy',
+        value: `${stats.accuracy}%`,
+      },
+    ];
+  }, [stats]);
+
+  // ----------------------------------------------------
+  // LOADING STATE
+  // ----------------------------------------------------
+
   if (loading) {
     return (
-      <div className="page profile-page">
-        <div className="profile-loading-card">
-          <div className="loading-spinner">⟳</div>
-          <h2>Loading your profile...</h2>
-          <p>Preparing your QuestForge stats and achievements.</p>
-        </div>
-      </div>
+      <main className="page profile-page">
+        <section
+          className="profile-state-card"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <span className="profile-state-icon profile-loading-icon">
+            ✦
+          </span>
+
+          <h2>Loading your profile</h2>
+
+          <p>
+            Preparing your QuestForge stats and achievements.
+          </p>
+
+          <span className="profile-loading-track">
+            <span />
+          </span>
+        </section>
+      </main>
     );
   }
+
+  // ----------------------------------------------------
+  // ERROR STATE
+  // ----------------------------------------------------
 
   if (error && !profile) {
     return (
-      <div className="page profile-page">
-        <div className="empty-card">
-          <h2>Unable to Load Profile</h2>
-          <p className="error-text">{error}</p>
-          <button
-            className="primary-button"
-            onClick={() => {
-              setLoading(true);
-              fetchProfile();
-            }}
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
+      <main className="page profile-page">
+        <section className="profile-state-card">
+          <span className="profile-state-icon">⚠</span>
 
-  if (!profile) {
-    return (
-      <div className="page profile-page">
-        <div className="empty-card">
-          <h2>Profile Not Found</h2>
-          <p>We could not load your QuestForge profile.</p>
-        </div>
-      </div>
-    );
-  }
+          <p className="profile-eyebrow">
+            QUESTFORGE / PROFILE
+          </p>
 
-  
-  const averageScore = Number(profile.averageScore) || 0;
-  const bestScore = Number(profile.bestScore) || 0;
-  const totalAttempts = Number(profile.totalAttempts) || 0;
-  const correctAnswers = Number(profile.totalCorrectAnswers) || 0;
-  const questionsAttempted = Number(profile.totalQuestionsAttempted) || 0;
+          <h2>Unable to load profile</h2>
 
-  const accuracy =
-    questionsAttempted > 0
-      ? Math.round((correctAnswers / questionsAttempted) * 100)
-      : 0;
+          <p className="profile-error-copy">
+            {error}
+          </p>
 
-  const xp = totalAttempts * 25 + bestScore * 2;
-  const level = Math.floor(xp / 500) + 1;
-  const levelXp = xp % 500;
-  const xpPercentage = Math.min((levelXp / 500) * 100, 100);
-
-  return (
-    <div className="page profile-page">
-      {/* PAGE HEADER */}
-      <div className="challenges-header profile-header-actions">
-        <div>
-          <p className="eyebrow">QUESTFORGE</p>
-          <h1>My Profile</h1>
-          <p>Your coding journey, progress and achievements in one place.</p>
-        </div>
-
-        <div className="navbar-links">
-          <Link to="/challenges" className="secondary-button">
-            🚀 Challenges
-          </Link>
-          <Link to="/leaderboard" className="secondary-button">
-            🏆 Leaderboard
-          </Link>
-        </div>
-      </div>
-
-      {/* ALERTS */}
-      {error && <div className="profile-message profile-message-error">⚠️ {error}</div>}
-      {message && <div className="profile-message">✓ {message}</div>}
-
-      {/* PROFILE HERO */}
-      <section className="profile-hero-card">
-        <div className="profile-hero-glow" />
-
-        <div className="profile-avatar-section">
           <button
             type="button"
-            className="profile-avatar-button"
-            onClick={handleAvatarButtonClick}
-            disabled={uploadingImage}
-            title="Change profile image"
+            className="profile-button profile-button-primary"
+            onClick={fetchProfile}
           >
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="Profile" className="profile-avatar-image" />
-            ) : (
-              <div className="profile-avatar-placeholder">
-                {(profile.name || user?.name || 'U').charAt(0).toUpperCase()}
-              </div>
-            )}
-            <span className="profile-avatar-edit">✎</span>
+            Try again <span>→</span>
           </button>
+        </section>
+      </main>
+    );
+  }
+
+  // ----------------------------------------------------
+  // EMPTY STATE
+  // ----------------------------------------------------
+
+  if (!profile || !stats) {
+    return (
+      <main className="page profile-page">
+        <section className="profile-state-card">
+          <span className="profile-state-icon">◈</span>
+
+          <h2>Profile not found</h2>
+
+          <p>
+            We could not load your QuestForge profile.
+          </p>
+
+          <button
+            type="button"
+            className="profile-button profile-button-primary"
+            onClick={fetchProfile}
+          >
+            Reload profile →
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  // ======================================================
+  // MAIN UI
+  // ======================================================
+
+  return (
+    <main className="page profile-page">
+
+      {/* PAGE HEADER */}
+
+      <header className="profile-page-header">
+        <div className="profile-heading-copy">
+          <span className="profile-eyebrow">
+            <span /> QUESTFORGE / YOUR SPACE
+          </span>
+
+          <h1>
+            My <span>Profile</span>
+          </h1>
+
+          <p>
+            Your coding journey, progress and achievements — all in one place.
+          </p>
+        </div>
+
+        <nav
+          className="profile-header-nav"
+          aria-label="Profile navigation"
+        >
+          <Link
+            to="/challenges"
+            className="profile-button profile-button-secondary"
+          >
+            <span>⌘</span> Challenges
+          </Link>
+
+          <Link
+            to="/leaderboard"
+            className="profile-button profile-button-secondary"
+          >
+            <span>♛</span> Leaderboard
+          </Link>
+        </nav>
+      </header>
+
+      {/* ALERTS */}
+
+      {error && (
+        <div
+          className="profile-alert profile-alert-error"
+          role="alert"
+        >
+          <span>⚠</span>
+
+          {error}
+
+          <button
+            type="button"
+            onClick={() => setError('')}
+            aria-label="Dismiss error"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {message && (
+        <div
+          className="profile-alert profile-alert-success"
+          role="status"
+        >
+          <span>✓</span>
+
+          {message}
+
+          <button
+            type="button"
+            onClick={() => setMessage('')}
+            aria-label="Dismiss message"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* PROFILE HERO */}
+
+      <section className="profile-hero-card">
+        <div className="profile-hero-orb profile-hero-orb-one" />
+        <div className="profile-hero-orb profile-hero-orb-two" />
+
+        <div className="profile-avatar-column">
+          <div className="profile-avatar-frame">
+            <button
+              type="button"
+              className="profile-avatar-button"
+              onClick={handleAvatarButtonClick}
+              disabled={isBusy}
+              title="Change profile image"
+              aria-label="Change profile image"
+            >
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={`${displayName}'s profile`}
+                  className="profile-avatar-image"
+                />
+              ) : (
+                <span className="profile-avatar-placeholder">
+                  {initials}
+                </span>
+              )}
+
+              <span className="profile-avatar-edit">
+                ✎
+              </span>
+            </button>
+
+            <span className="profile-avatar-status" />
+          </div>
 
           <input
             ref={fileInputRef}
+            className="profile-file-input"
             type="file"
-            accept="image/*"
+            accept={ALLOWED_IMAGE_TYPES.join(',')}
             onChange={handleImageChange}
-            hidden
+            aria-label="Choose profile image"
           />
 
           <button
             type="button"
-            className="avatar-upload-button secondary-button"
+            className="profile-button profile-button-secondary profile-photo-button"
             onClick={handleAvatarButtonClick}
-            disabled={uploadingImage}
+            disabled={isBusy}
           >
-            {uploadingImage ? 'Uploading...' : '📷 Change Photo'}
+            {uploadingImage
+              ? 'Uploading...'
+              : '＋ Change photo'}
           </button>
 
           {profile.profileImagePresent && (
             <button
               type="button"
-              className="avatar-remove-button secondary-button delete-button"
+              className="profile-remove-photo"
               onClick={handleRemoveImage}
-              disabled={removingImage}
+              disabled={isBusy}
             >
-              {removingImage ? 'Removing...' : 'Remove Photo'}
+              {removingImage
+                ? 'Removing...'
+                : 'Remove photo'}
             </button>
           )}
 
-          <p className="avatar-help-text">JPG, PNG, WEBP • Max 5 MB</p>
+          <span className="profile-avatar-hint">
+            JPG, PNG, WEBP · Max 5 MB
+          </span>
         </div>
 
-        <div className="profile-hero-info">
-          <div className="profile-name-row">
-            <div>
-              <h2>{profile.name}</h2>
+        <div className="profile-hero-content">
+          <div className="profile-identity-row">
+            <div className="profile-identity">
+              <span className="profile-card-kicker">
+                WELCOME BACK
+              </span>
+
+              <h2>{displayName}</h2>
+
               <p>{profile.email}</p>
             </div>
+
             <span className="profile-role-badge">
-              {profile.role === 'ADMIN' ? '👑 ADMIN' : '⚡ CODER'}
+              <span>
+                {profile.role === 'ADMIN' ? '♛' : '⚡'}
+              </span>
+
+              {profile.role === 'ADMIN' ? 'ADMIN' : 'CODER'}
             </span>
           </div>
 
-          <div className="profile-level-row">
-            <span className="profile-level-badge">LEVEL {level}</span>
-            <div className="profile-xp-area">
-              <div className="profile-xp-top">
-                <span>{levelXp} / 500 XP</span>
-                <span>{xp} Total XP</span>
+          {/* LEVEL AND XP */}
+
+          <div className="profile-level-panel">
+            <div className="profile-level-topline">
+              <div>
+                <span className="profile-level-label">
+                  CURRENT RANK
+                </span>
+
+                <strong>LEVEL {stats.level}</strong>
               </div>
-              <div className="profile-xp-bar">
-                <span style={{ width: `${xpPercentage}%` }} />
+
+              <div className="profile-xp-total">
+                <strong>
+                  {stats.xp.toLocaleString()}
+                </strong>
+
+                <span>TOTAL XP</span>
               </div>
             </div>
+
+            <div className="profile-xp-meta">
+              <span>Level progress</span>
+
+              <strong>
+                {stats.levelXp}
+                <span> / {XP_PER_LEVEL} XP</span>
+              </strong>
+            </div>
+
+            <div
+              className="profile-xp-bar"
+              role="progressbar"
+              aria-label="Level progress"
+              aria-valuemin={0}
+              aria-valuemax={XP_PER_LEVEL}
+              aria-valuenow={stats.levelXp}
+            >
+              <span
+                style={{
+                  width: `${stats.xpPercentage}%`,
+                }}
+              />
+            </div>
+
+            <p className="profile-xp-next">
+              {stats.xpRemaining} XP to reach Level {stats.level + 1}
+            </p>
           </div>
         </div>
       </section>
 
-      {/* EDIT PROFILE / PERSONAL INFO */}
-      <section className="profile-edit-card">
+      {/* PERSONAL INFORMATION */}
+
+      <section className="profile-panel profile-personal-panel">
         <div className="profile-section-heading">
-          <div>
-            <span className="section-icon">✨</span>
+          <div className="profile-section-title">
+            <span className="profile-section-icon">
+              ✦
+            </span>
+
             <div>
+              <span className="profile-card-kicker">
+                ACCOUNT DETAILS
+              </span>
+
               <h2>Personal Information</h2>
-              <p>Keep your QuestForge profile up to date.</p>
+
+              <p>
+                Manage the details associated with your account.
+              </p>
             </div>
           </div>
 
           {!editMode && (
             <button
               type="button"
-              className="secondary-button"
-              onClick={() => {
-                setName(profile.name || '');
-                setError('');
-                setMessage('');
-                setEditMode(true);
-              }}
+              className="profile-button profile-button-secondary"
+              onClick={handleStartEdit}
+              disabled={isBusy}
             >
-              ✎ Edit Profile
+              ✎ Edit profile
             </button>
           )}
         </div>
 
         {editMode ? (
-          <form className="profile-edit-form" onSubmit={handleSaveName}>
-            <div className="profile-form-field">
-              <label htmlFor="profile-name">Display Name</label>
-              <input
-                id="profile-name"
-                type="text"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                maxLength={100}
-                placeholder="Enter your name"
-                autoFocus
-                className="profile-input"
-              />
-              <small>Your name is visible across QuestForge.</small>
-            </div>
+          <form
+            className="profile-edit-form"
+            onSubmit={handleSaveName}
+          >
+            <div className="profile-form-grid">
+              <div className="profile-form-field">
+                <label htmlFor="profile-name">
+                  Display name
+                </label>
 
-            <div className="profile-form-field">
-              <label>Email Address</label>
-              <input
-                type="email"
-                value={profile.email || ''}
-                disabled
-                className="profile-input"
-              />
-              <small>Email cannot be changed from the profile page.</small>
+                <input
+                  id="profile-name"
+                  type="text"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  maxLength={MAX_NAME_LENGTH}
+                  placeholder="Enter your name"
+                  autoFocus
+                  autoComplete="name"
+                  className="profile-input"
+                  disabled={savingName}
+                  required
+                />
+
+                <small>
+                  {name.length}/{MAX_NAME_LENGTH} characters.
+                  Your name is visible across QuestForge.
+                </small>
+              </div>
+
+              <div className="profile-form-field">
+                <label htmlFor="profile-email">
+                  Email address
+                </label>
+
+                <input
+                  id="profile-email"
+                  type="email"
+                  value={profile.email || ''}
+                  disabled
+                  className="profile-input"
+                />
+
+                <small>
+                  Email cannot be changed from this page.
+                </small>
+              </div>
             </div>
 
             <div className="profile-edit-actions">
               <button
                 type="button"
-                className="secondary-button"
+                className="profile-button profile-button-secondary"
                 onClick={handleCancelEdit}
                 disabled={savingName}
               >
@@ -482,175 +1070,227 @@ function Profile() {
 
               <button
                 type="submit"
-                className="primary-button"
-                disabled={savingName}
+                className="profile-button profile-button-primary"
+                disabled={
+                  savingName ||
+                  !name.trim() ||
+                  name.trim().length > MAX_NAME_LENGTH
+                }
               >
-                {savingName ? 'Saving...' : '✓ Save Changes'}
+                {savingName
+                  ? 'Saving...'
+                  : '✓ Save changes'}
               </button>
             </div>
           </form>
         ) : (
-          <div className="profile-readonly-grid">
-            <div className="profile-readonly-field">
-              <span>Display Name</span>
-              <strong>{profile.name}</strong>
+          <div className="profile-details-grid">
+            <div className="profile-detail-item">
+              <span>DISPLAY NAME</span>
+
+              <strong>
+                {profile.name || 'Not set'}
+              </strong>
             </div>
 
-            <div className="profile-readonly-field">
-              <span>Email</span>
-              <strong>{profile.email}</strong>
+            <div className="profile-detail-item">
+              <span>EMAIL ADDRESS</span>
+
+              <strong>
+                {profile.email || 'Not available'}
+              </strong>
             </div>
 
-            <div className="profile-readonly-field">
-              <span>Account Type</span>
-              <strong>{profile.role}</strong>
+            <div className="profile-detail-item">
+              <span>ACCOUNT TYPE</span>
+
+              <strong>
+                {profile.role || 'USER'}
+              </strong>
             </div>
           </div>
         )}
       </section>
 
-      {/* STATS */}
-      <section className="profile-stats-grid">
-        <div className="profile-stat-card">
-          <span className="stat-icon">🎯</span>
-          <span>Total Attempts</span>
-          <strong>{totalAttempts}</strong>
+      {/* PERFORMANCE ANALYTICS */}
+
+      <section className="profile-stats-section">
+        <div className="profile-section-heading profile-stats-heading">
+          <div className="profile-section-title">
+            <span className="profile-section-icon">
+              ▦
+            </span>
+
+            <div>
+              <span className="profile-card-kicker">
+                YOUR PERFORMANCE
+              </span>
+
+              <h2>Stats &amp; Analytics</h2>
+
+              <p>
+                A snapshot of your coding activity so far.
+              </p>
+            </div>
+          </div>
+
+          <span className="profile-section-note">
+            LIVE PROFILE DATA
+          </span>
         </div>
 
-        <div className="profile-stat-card">
-          <span className="stat-icon">🚀</span>
-          <span>First Attempts</span>
-          <strong>{profile.firstAttempts || 0}</strong>
-        </div>
+        <div className="profile-stats-grid">
+          {statCards.map((stat, index) => (
+            <article
+              className="profile-stat-card"
+              key={stat.label}
+            >
+              <div className="profile-stat-top">
+                <span className="profile-stat-icon">
+                  {stat.icon}
+                </span>
 
-        <div className="profile-stat-card">
-          <span className="stat-icon">🔁</span>
-          <span>Practice Attempts</span>
-          <strong>{profile.practiceAttempts || 0}</strong>
-        </div>
+                <span className="profile-stat-index">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+              </div>
 
-        <div className="profile-stat-card">
-          <span className="stat-icon">📊</span>
-          <span>Average Score</span>
-          <strong>{averageScore}</strong>
-        </div>
+              <strong className="profile-stat-value">
+                {stat.value}
+              </strong>
 
-        <div className="profile-stat-card">
-          <span className="stat-icon">🏆</span>
-          <span>Best Score</span>
-          <strong>{bestScore}</strong>
-        </div>
-
-        <div className="profile-stat-card">
-          <span className="stat-icon">✅</span>
-          <span>Correct Answers</span>
-          <strong>{correctAnswers}</strong>
-        </div>
-
-        <div className="profile-stat-card">
-          <span className="stat-icon">🧠</span>
-          <span>Questions Attempted</span>
-          <strong>{questionsAttempted}</strong>
-        </div>
-
-        <div className="profile-stat-card">
-          <span className="stat-icon">🎯</span>
-          <span>Accuracy</span>
-          <strong>{accuracy}%</strong>
+              <span className="profile-stat-label">
+                {stat.label}
+              </span>
+            </article>
+          ))}
         </div>
       </section>
 
-      {/* STREAK */}
+      {/* STREAK / MOTIVATION */}
+
       <section className="profile-streak-card">
-        <div className="streak-left">
-          <span className="streak-icon">🔥</span>
-          <div>
-            <h2>Keep Your Streak Alive!</h2>
-            <p>Solve challenges regularly to keep improving your coding skills.</p>
-          </div>
+        <div className="profile-streak-art">
+          🔥
         </div>
 
-        <Link to="/challenges" className="primary-button">
-          Start Solving →
+        <div className="profile-streak-copy">
+          <span className="profile-card-kicker">
+            STAY CONSISTENT
+          </span>
+
+          <h2>
+            Keep your momentum alive.
+          </h2>
+
+          <p>
+            Every challenge is a chance to sharpen your problem-solving skills.
+            Your next milestone starts here.
+          </p>
+        </div>
+
+        <Link
+          to="/challenges"
+          className="profile-button profile-button-primary"
+        >
+          Start solving →
         </Link>
       </section>
 
       {/* ACHIEVEMENTS */}
-      <section className="profile-achievements-section">
+
+      <section className="profile-panel profile-achievements-section">
         <div className="profile-section-heading">
-          <div>
-            <span className="section-icon">🏅</span>
+          <div className="profile-section-title">
+            <span className="profile-section-icon">
+              ♛
+            </span>
+
             <div>
+              <span className="profile-card-kicker">
+                MILESTONES
+              </span>
+
               <h2>Achievements</h2>
-              <p>Milestones from your QuestForge journey.</p>
+
+              <p>
+                Milestones earned through your QuestForge activity.
+              </p>
             </div>
           </div>
-          <span className="achievement-count">
-            {totalAttempts > 0 ? '3 unlocked' : '0 unlocked'}
+
+          <span className="profile-achievement-count">
+            {unlockedAchievements} / {achievements.length} UNLOCKED
           </span>
         </div>
 
-        {totalAttempts === 0 ? (
-          <div className="profile-achievements-empty">
-            <span>🏅</span>
-            <h3>Your first achievement is waiting!</h3>
-            <p>Complete your first challenge to begin your QuestForge journey.</p>
-            <Link to="/challenges" className="primary-button">
-              Explore Challenges
-            </Link>
-          </div>
-        ) : (
-          <div className="achievement-grid">
-            <div className="achievement-card">
-              <span className="achievement-icon">🚀</span>
-              <div>
-                <h3>First Mission</h3>
-                <p>Completed your first challenge.</p>
-              </div>
-              <span className="achievement-unlocked">✓</span>
-            </div>
+        <div className="profile-achievement-grid">
+          {achievements.map((achievement) => (
+            <article
+              className={`profile-achievement-card ${
+                achievement.unlocked
+                  ? 'is-unlocked'
+                  : 'is-locked'
+              }`}
+              key={achievement.id}
+            >
+              <span className="profile-achievement-icon">
+                {achievement.icon}
+              </span>
 
-            <div className="achievement-card">
-              <span className="achievement-icon">🎯</span>
-              <div>
-                <h3>Persistent Coder</h3>
-                <p>Made multiple challenge attempts.</p>
-              </div>
-              <span className="achievement-unlocked">✓</span>
-            </div>
+              <div className="profile-achievement-copy">
+                <h3>{achievement.title}</h3>
 
-            <div className="achievement-card">
-              <span className="achievement-icon">🏆</span>
-              <div>
-                <h3>Score Hunter</h3>
-                <p>Built your QuestForge score.</p>
+                <p>{achievement.description}</p>
               </div>
-              <span className="achievement-unlocked">✓</span>
-            </div>
-          </div>
-        )}
+
+              <span className="profile-achievement-status">
+                {achievement.unlocked ? '✓' : '⌑'}
+              </span>
+            </article>
+          ))}
+        </div>
       </section>
 
       {/* FOOTER */}
-      <section className="profile-footer-card">
-        <div className="profile-footer-info">
-          <span>💡</span>
-          <div>
-            <h2>Ready for the next quest?</h2>
-            <p>Every challenge you solve makes you a better developer.</p>
-          </div>
+
+      <footer className="profile-footer-card">
+        <div className="profile-footer-mark">
+          ✧
+        </div>
+
+        <div className="profile-footer-copy">
+          <span className="profile-card-kicker">
+            YOUR NEXT CHAPTER
+          </span>
+
+          <h2>
+            Ready for your next quest?
+          </h2>
+
+          <p>
+            Keep learning, keep building, and make every attempt count.
+          </p>
         </div>
 
         <div className="profile-footer-actions">
-          <Link to="/challenges" className="primary-button">
-            🚀 Solve Challenge
+          <Link
+            to="/challenges"
+            className="profile-button profile-button-primary"
+          >
+            🚀 Solve challenge
           </Link>
-          <Link to="/submissions" className="secondary-button">
-            View Submissions
+
+          <Link
+            to="/submissions"
+            className="profile-button profile-button-secondary"
+          >
+            View submissions
           </Link>
         </div>
-      </section>
-    </div>
+      </footer>
+
+    </main>
   );
 }
 

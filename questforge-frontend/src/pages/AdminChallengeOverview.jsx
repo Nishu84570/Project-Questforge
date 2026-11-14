@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../services/api';
 import '../styles/AdminChallengeOverview.css';
@@ -12,10 +13,48 @@ function AdminChallengeOverview() {
   const [difficultyFilter, setDifficultyFilter] = useState('ALL');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
 
-  // ==========================================
-  // LOAD CHALLENGE OVERVIEW
-  // ==========================================
-  const loadChallenges = async () => {
+  // ------------------------------------------
+  // HELPERS
+  // ------------------------------------------
+
+  const toNumber = (value, fallback = 0) => {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : fallback;
+  };
+
+  const formatNumber = (value, digits = 0) => {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(toNumber(value));
+  };
+
+  const formatPercentage = (value) => {
+    return `${formatNumber(value, 1)}%`;
+  };
+
+  const getCompletionValue = (value) => {
+    return Math.min(100, Math.max(0, toNumber(value)));
+  };
+
+  const getChallengeId = (challenge) => {
+    return challenge?.challengeId ?? challenge?.id;
+  };
+
+  const getDifficultyClass = (difficulty) => {
+    const normalized = String(difficulty || 'unknown')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '');
+
+    return normalized || 'unknown';
+  };
+
+  // ------------------------------------------
+  // LOAD CHALLENGES
+  // ------------------------------------------
+
+  const loadChallenges = useCallback(async () => {
     setLoading(true);
     setError('');
 
@@ -25,45 +64,70 @@ function AdminChallengeOverview() {
       });
 
       if (!response.ok) {
-        setError(data?.message || 'Failed to load challenge overview.');
-        return;
+        throw new Error(
+          data?.message || 'Failed to load challenge overview.'
+        );
       }
 
-      setChallenges(
-        Array.isArray(data)
-          ? data
-          : Array.isArray(data?.content)
-          ? data.content
-          : Array.isArray(data?.challenges)
-          ? data.challenges
-          : []
-      );
+      const challengeData = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.content)
+        ? data.content
+        : Array.isArray(data?.challenges)
+        ? data.challenges
+        : [];
+
+      setChallenges(challengeData.filter(
+        (challenge) =>
+          challenge !== null &&
+          typeof challenge === 'object' &&
+          !Array.isArray(challenge)
+      ));
     } catch (err) {
       console.error('Admin challenge overview error:', err);
-      setError('Unable to connect to QuestForge backend.');
+
+      setError(
+        err?.message || 'Unable to connect to QuestForge backend.'
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadChallenges();
-  }, []);
+  }, [loadChallenges]);
 
-  // ==========================================
-  // UNIQUE DIFFICULTIES & CATEGORIES
-  // ==========================================
+  // ------------------------------------------
+  // FILTER OPTIONS
+  // ------------------------------------------
+
   const difficulties = useMemo(() => {
-    return [...new Set(challenges.map((c) => c.difficulty).filter(Boolean))];
+    return [
+      ...new Set(
+        challenges
+          .map((challenge) => challenge.difficulty)
+          .filter((value) => value != null && String(value).trim())
+          .map(String)
+      ),
+    ].sort((a, b) => a.localeCompare(b));
   }, [challenges]);
 
   const categories = useMemo(() => {
-    return [...new Set(challenges.map((c) => c.category).filter(Boolean))];
+    return [
+      ...new Set(
+        challenges
+          .map((challenge) => challenge.category)
+          .filter((value) => value != null && String(value).trim())
+          .map(String)
+      ),
+    ].sort((a, b) => a.localeCompare(b));
   }, [challenges]);
 
-  // ==========================================
-  // FILTER
-  // ==========================================
+  // ------------------------------------------
+  // SEARCH & FILTER
+  // ------------------------------------------
+
   const filteredChallenges = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
@@ -71,15 +135,23 @@ function AdminChallengeOverview() {
       const difficulty = String(challenge.difficulty || '');
       const category = String(challenge.category || '');
 
-      if (difficultyFilter !== 'ALL' && difficulty !== difficultyFilter) {
+      if (
+        difficultyFilter !== 'ALL' &&
+        difficulty !== difficultyFilter
+      ) {
         return false;
       }
 
-      if (categoryFilter !== 'ALL' && category !== categoryFilter) {
+      if (
+        categoryFilter !== 'ALL' &&
+        category !== categoryFilter
+      ) {
         return false;
       }
 
-      if (!normalizedSearch) return true;
+      if (!normalizedSearch) {
+        return true;
+      }
 
       const searchableText = [
         challenge.challengeId,
@@ -88,28 +160,48 @@ function AdminChallengeOverview() {
         challenge.difficulty,
         challenge.category,
       ]
-        .filter((val) => val !== null && val !== undefined)
+        .filter((value) => value !== null && value !== undefined)
         .join(' ')
         .toLowerCase();
 
       return searchableText.includes(normalizedSearch);
     });
-  }, [challenges, search, difficultyFilter, categoryFilter]);
+  }, [
+    challenges,
+    search,
+    difficultyFilter,
+    categoryFilter,
+  ]);
 
-  // ==========================================
-  // FORMATTERS
-  // ==========================================
-  const formatNumber = (value, digits = 0) => {
-    const number = Number(value);
-    if (!Number.isFinite(number)) return '0';
-    return number.toFixed(digits);
-  };
+  // ------------------------------------------
+  // SUMMARY STATISTICS
+  // ------------------------------------------
 
-  const formatPercentage = (value) => {
-    const number = Number(value);
-    if (!Number.isFinite(number)) return '0%';
-    return `${number.toFixed(1)}%`;
-  };
+  const statistics = useMemo(() => {
+    return challenges.reduce(
+      (stats, challenge) => {
+        stats.submissions += Math.max(
+          0,
+          toNumber(challenge.totalSubmissions)
+        );
+
+        stats.participants += Math.max(
+          0,
+          toNumber(challenge.uniqueParticipants)
+        );
+
+        return stats;
+      },
+      {
+        submissions: 0,
+        participants: 0,
+      }
+    );
+  }, [challenges]);
+
+  // ------------------------------------------
+  // FILTER ACTIONS
+  // ------------------------------------------
 
   const clearFilters = () => {
     setSearch('');
@@ -117,201 +209,483 @@ function AdminChallengeOverview() {
     setCategoryFilter('ALL');
   };
 
-  if (error) {
-    return (
-      <div className="page admin-page">
-        <div className="empty-card">
-          <p className="error-text">{error}</p>
-          <button className="primary-button" onClick={loadChallenges}>
-            Retry Loading
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const hasActiveFilters =
+    search.trim() !== '' ||
+    difficultyFilter !== 'ALL' ||
+    categoryFilter !== 'ALL';
+
+  // ------------------------------------------
+  // RENDER
+  // ------------------------------------------
 
   return (
     <div className="page admin-page admin-challenge-overview-page">
+
       {/* HEADER */}
-      <div className="page-header">
-        <div>
-          <span className="eyebrow">ADMIN</span>
+
+      <header className="aco-header">
+        <div className="aco-header-content">
+          <div className="aco-breadcrumb">
+            <span className="aco-breadcrumb-dot" />
+            QUESTFORGE ADMIN
+          </div>
+
           <h1>Challenge Overview</h1>
-          <p>Monitor challenge participation, scores and completion rates.</p>
+
+          <p>
+            Monitor challenge performance, participation,
+            submissions and completion analytics.
+          </p>
         </div>
-        <div className="header-actions">
-          <Link to="/admin" className="secondary-button">
-            ← Admin Dashboard
+
+        <div className="aco-header-actions">
+          <Link to="/admin" className="aco-button aco-button-secondary">
+            <span>←</span>
+            Admin Dashboard
           </Link>
+
           <button
-            className="secondary-button refresh-btn"
+            type="button"
+            className="aco-button aco-button-primary"
             onClick={loadChallenges}
             disabled={loading}
           >
-            {loading ? 'Loading...' : '↻ Refresh'}
+            <span className={loading ? 'aco-refresh-spinning' : ''}>
+              ↻
+            </span>
+            {loading ? 'Refreshing...' : 'Refresh Data'}
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* SUMMARY STATS */}
-      <div className="result-stats">
-        <div className="result-stat-card">
-          <span className="result-stat-label">Challenges</span>
-          <strong>{challenges.length}</strong>
-        </div>
-        <div className="result-stat-card">
-          <span className="result-stat-label">Showing</span>
-          <strong>{filteredChallenges.length}</strong>
-        </div>
-        <div className="result-stat-card">
-          <span className="result-stat-label">Submissions</span>
-          <strong>
-            {challenges.reduce(
-              (total, c) => total + Number(c.totalSubmissions || 0),
-              0
-            )}
-          </strong>
-        </div>
-        <div className="result-stat-card">
-          <span className="result-stat-label">Participants</span>
-          <strong>
-            {challenges.reduce(
-              (total, c) => total + Number(c.uniqueParticipants || 0),
-              0
-            )}
-          </strong>
-        </div>
-      </div>
+      {/* ERROR NOTICE */}
 
-      {/* FILTERS CARD */}
-      <div className="admin-form-card filter-card">
-        <div className="filter-controls-wrapper">
-          <input
-            type="text"
-            placeholder="Search challenge..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="admin-search-input"
-          />
+      {error && (
+        <div className="aco-error-banner" role="alert">
+          <div className="aco-error-content">
+            <span className="aco-error-icon">!</span>
+
+            <div>
+              <strong>Unable to load challenge data</strong>
+              <p>{error}</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="aco-error-retry"
+            onClick={loadChallenges}
+            disabled={loading}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* STATISTICS */}
+
+      <section className="aco-stats-grid" aria-label="Challenge statistics">
+
+        <div className="aco-stat-card">
+          <div className="aco-stat-top">
+            <span className="aco-stat-label">Total Challenges</span>
+            <span className="aco-stat-icon aco-icon-purple">▦</span>
+          </div>
+
+          <strong className="aco-stat-value">
+            {formatNumber(challenges.length)}
+          </strong>
+
+          <span className="aco-stat-description">
+            Challenges available in the overview
+          </span>
+        </div>
+
+        <div className="aco-stat-card">
+          <div className="aco-stat-top">
+            <span className="aco-stat-label">Filtered Results</span>
+            <span className="aco-stat-icon aco-icon-blue">⌕</span>
+          </div>
+
+          <strong className="aco-stat-value">
+            {formatNumber(filteredChallenges.length)}
+          </strong>
+
+          <span className="aco-stat-description">
+            Matching current search and filters
+          </span>
+        </div>
+
+        <div className="aco-stat-card">
+          <div className="aco-stat-top">
+            <span className="aco-stat-label">Total Submissions</span>
+            <span className="aco-stat-icon aco-icon-green">↗</span>
+          </div>
+
+          <strong className="aco-stat-value">
+            {formatNumber(statistics.submissions)}
+          </strong>
+
+          <span className="aco-stat-description">
+            Combined challenge submissions
+          </span>
+        </div>
+
+        <div className="aco-stat-card">
+          <div className="aco-stat-top">
+            <span className="aco-stat-label">Total Participants</span>
+            <span className="aco-stat-icon aco-icon-orange">♙</span>
+          </div>
+
+          <strong className="aco-stat-value">
+            {formatNumber(statistics.participants)}
+          </strong>
+
+          <span className="aco-stat-description">
+            Combined unique participants
+          </span>
+        </div>
+
+      </section>
+
+      {/* FILTER PANEL */}
+
+      <section className="aco-filter-panel">
+
+        <div className="aco-filter-heading">
+          <div>
+            <span className="aco-section-eyebrow">DISCOVER</span>
+            <h2>Find Challenges</h2>
+            <p>Search and narrow down your challenge records.</p>
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              className="aco-clear-button"
+              onClick={clearFilters}
+            >
+              Reset all filters
+              <span>×</span>
+            </button>
+          )}
+        </div>
+
+        <div className="aco-filter-controls">
+
+          <div className="aco-search-wrapper">
+            <span className="aco-search-icon">⌕</span>
+
+            <input
+              type="search"
+              placeholder="Search by title, ID, difficulty or category..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="aco-search-input"
+              aria-label="Search challenges"
+            />
+
+            {search && (
+              <button
+                type="button"
+                className="aco-search-clear"
+                onClick={() => setSearch('')}
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
 
           <select
             value={difficultyFilter}
-            onChange={(e) => setDifficultyFilter(e.target.value)}
-            className="admin-select"
+            onChange={(event) => setDifficultyFilter(event.target.value)}
+            className="aco-select"
+            aria-label="Filter by difficulty"
           >
             <option value="ALL">All Difficulties</option>
-            {difficulties.map((diff) => (
-              <option key={diff} value={diff}>
-                {diff}
+
+            {difficulties.map((difficulty) => (
+              <option key={difficulty} value={difficulty}>
+                {difficulty}
               </option>
             ))}
           </select>
 
           <select
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="admin-select"
+            onChange={(event) => setCategoryFilter(event.target.value)}
+            className="aco-select"
+            aria-label="Filter by category"
           >
             <option value="ALL">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
               </option>
             ))}
           </select>
 
-          {(search || difficultyFilter !== 'ALL' || categoryFilter !== 'ALL') && (
-            <button className="secondary-button" onClick={clearFilters}>
-              Clear
-            </button>
+        </div>
+
+        <div className="aco-filter-footer">
+          <span>
+            Showing <strong>{formatNumber(filteredChallenges.length)}</strong>
+            {' '}of <strong>{formatNumber(challenges.length)}</strong> challenges
+          </span>
+
+          {hasActiveFilters && (
+            <span className="aco-filter-active">
+              Filters active
+            </span>
           )}
         </div>
-      </div>
 
-      {/* TABLE SECTION */}
-      <div className="admin-table-card">
-        <div className="section-heading">
+      </section>
+
+      {/* CHALLENGE PERFORMANCE */}
+
+      <section className="aco-table-card">
+
+        <div className="aco-table-header">
           <div>
-            <span className="eyebrow">CHALLENGES</span>
+            <span className="aco-section-eyebrow">PERFORMANCE CENTER</span>
             <h2>Challenge Performance</h2>
+            <p>
+              Detailed statistics for every coding challenge.
+            </p>
+          </div>
+
+          <div className="aco-live-indicator">
+            <span />
+            {loading ? 'Updating data' : 'Overview ready'}
           </div>
         </div>
 
-        {loading ? (
-          <div className="empty-card">
-            <div className="loading-spinner"></div>
-            <h2>Loading challenge data...</h2>
+        {/* LOADING STATE */}
+
+        {loading && challenges.length === 0 ? (
+          <div className="aco-state-container">
+            <div className="aco-spinner" />
+            <h3>Loading challenge data</h3>
+            <p>Fetching the latest challenge statistics...</p>
           </div>
         ) : filteredChallenges.length === 0 ? (
-          <div className="empty-card">
-            <h2>No challenges found</h2>
-            <p>Try changing the filters or search criteria.</p>
-            <button className="secondary-button" onClick={clearFilters}>
-              Reset Filters
-            </button>
+
+          /* EMPTY STATE */
+
+          <div className="aco-state-container">
+            <div className="aco-empty-icon">⌕</div>
+
+            <h3>
+              {challenges.length === 0
+                ? 'No challenges available'
+                : 'No matching challenges'}
+            </h3>
+
+            <p>
+              {challenges.length === 0
+                ? 'There are currently no challenge records to display.'
+                : 'Try changing your search or adjusting the filters.'}
+            </p>
+
+            {hasActiveFilters && (
+              <button
+                type="button"
+                className="aco-button aco-button-primary"
+                onClick={clearFilters}
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
+
         ) : (
-          <div className="table-responsive-wrapper">
-            <table className="admin-table">
+
+          /* DATA TABLE */
+
+          <div className="aco-table-responsive">
+            <table className="aco-table">
+
               <thead>
                 <tr>
-                  <th>Challenge</th>
-                  <th>Difficulty</th>
-                  <th>Category</th>
-                  <th>Submissions</th>
-                  <th>Participants</th>
-                  <th>Avg Score</th>
-                  <th>Completion</th>
-                  <th>Analytics</th>
+                  <th>CHALLENGE</th>
+                  <th>DIFFICULTY</th>
+                  <th>CATEGORY</th>
+                  <th>SUBMISSIONS</th>
+                  <th>PARTICIPANTS</th>
+                  <th>AVERAGE SCORE</th>
+                  <th>COMPLETION</th>
+                  <th>ACTION</th>
                 </tr>
               </thead>
+
               <tbody>
-                {filteredChallenges.map((challenge) => {
-                  const challengeId = challenge.challengeId ?? challenge.id;
+                {filteredChallenges.map((challenge, index) => {
+                  const challengeId = getChallengeId(challenge);
+                  const completion = getCompletionValue(
+                    challenge.completionRate
+                  );
 
                   return (
-                    <tr key={challengeId}>
+                    <tr key={challengeId ?? `challenge-${index}`}>
+
+                      {/* CHALLENGE */}
+
                       <td>
-                        <strong>
-                          {challenge.title || `Challenge #${challengeId ?? '—'}`}
-                        </strong>
-                        <br />
-                        <small className="table-subtext">
-                          #{challengeId ?? '—'}
-                        </small>
+                        <div className="aco-challenge-cell">
+                          <div className="aco-challenge-avatar">
+                            {String(challenge.title || 'C')
+                              .trim()
+                              .charAt(0)
+                              .toUpperCase()}
+                          </div>
+
+                          <div className="aco-challenge-info">
+                            <strong>
+                              {challenge.title ||
+                                `Challenge #${challengeId ?? '—'}`}
+                            </strong>
+
+                            <span>
+                              ID: #{challengeId ?? '—'}
+                            </span>
+                          </div>
+                        </div>
                       </td>
+
+                      {/* DIFFICULTY */}
+
                       <td>
-                        <span className={`table-difficulty ${String(challenge.difficulty || '').toLowerCase()}`}>
-                          {challenge.difficulty || '—'}
+                        <span
+                          className={`aco-difficulty-badge ${getDifficultyClass(
+                            challenge.difficulty
+                          )}`}
+                        >
+                          {challenge.difficulty || 'Unknown'}
                         </span>
                       </td>
-                      <td>{challenge.category || 'General'}</td>
+
+                      {/* CATEGORY */}
+
                       <td>
-                        <strong>{challenge.totalSubmissions ?? 0}</strong>
-                        <br />
-                        <small className="table-subtext">
-                          First: {challenge.firstSubmissions ?? 0}
-                        </small>
+                        <span className="aco-category-text">
+                          {challenge.category || 'General'}
+                        </span>
                       </td>
-                      <td>{challenge.uniqueParticipants ?? 0}</td>
-                      <td>{formatNumber(challenge.averageScore, 2)}</td>
-                      <td>{formatPercentage(challenge.completionRate)}</td>
+
+                      {/* SUBMISSIONS */}
+
                       <td>
-                        <Link
-                          to={`/admin/challenge-analytics/${challengeId}`}
-                          className="secondary-button analytics-btn"
-                        >
-                          View Analytics
-                        </Link>
+                        <div className="aco-metric-cell">
+                          <strong>
+                            {formatNumber(challenge.totalSubmissions)}
+                          </strong>
+
+                          <span>
+                            First: {formatNumber(challenge.firstSubmissions)}
+                          </span>
+                        </div>
                       </td>
+
+                      {/* PARTICIPANTS */}
+
+                      <td>
+                        <strong className="aco-table-number">
+                          {formatNumber(challenge.uniqueParticipants)}
+                        </strong>
+                      </td>
+
+                      {/* AVERAGE SCORE */}
+
+                      <td>
+                        <strong className="aco-table-number">
+                          {formatNumber(challenge.averageScore, 2)}
+                        </strong>
+                      </td>
+
+                      {/* COMPLETION */}
+
+                      <td>
+                        <div className="aco-completion-cell">
+                          <div className="aco-completion-info">
+                            <strong>
+                              {formatPercentage(challenge.completionRate)}
+                            </strong>
+                          </div>
+
+                          <div
+                            className="aco-progress-track"
+                            role="progressbar"
+                            aria-label={`Completion rate for ${
+                              challenge.title || 'challenge'
+                            }`}
+                            aria-valuenow={completion}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                          >
+                            <div
+                              className="aco-progress-fill"
+                              style={{ width: `${completion}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* ANALYTICS */}
+
+                      <td>
+                        {challengeId != null && challengeId !== '' ? (
+                          <Link
+                            to={`/admin/challenge-analytics/${encodeURIComponent(
+                              String(challengeId)
+                            )}`}
+                            className="aco-analytics-button"
+                          >
+                            Analytics
+                            <span>→</span>
+                          </Link>
+                        ) : (
+                          <span className="aco-unavailable">
+                            Unavailable
+                          </span>
+                        )}
+                      </td>
+
                     </tr>
                   );
                 })}
               </tbody>
+
             </table>
           </div>
         )}
-      </div>
+
+        {/* TABLE FOOTER */}
+
+        {filteredChallenges.length > 0 && (
+          <div className="aco-table-footer">
+            <span>
+              Displaying <strong>{formatNumber(filteredChallenges.length)}</strong>
+              {' '}challenge records
+            </span>
+
+            <span className="aco-footer-status">
+              QuestForge Analytics
+            </span>
+          </div>
+        )}
+
+      </section>
+
+      {/* PAGE FOOTER */}
+
+      <footer className="aco-page-footer">
+        <span>QUESTFORGE ADMINISTRATION</span>
+        <span>Challenge Intelligence & Performance</span>
+      </footer>
+
     </div>
   );
 }

@@ -1,229 +1,1416 @@
-/* Page Wrapper */
-.page.admin-dashboard-page {
-  padding: 32px 5%;
-  max-width: 1400px;
-  margin: 0 auto;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: #f3f4f6;
+
+/* =========================================================
+   QUESTFORGE - PREMIUM ADMIN DASHBOARD
+   Modern SaaS Admin Panel
+   Responsive | Advanced UI | Dark Theme
+========================================================= */
+
+.admin-dashboard-page.qad-page {
+  --qad-bg: #080d19;
+  --qad-card: #111a2b;
+  --qad-card-hover: #17243a;
+  --qad-border: rgba(148, 163, 184, 0.14);
+  --qad-text: #f1f5f9;
+  --qad-muted: #94a3b8;
+  --qad-purple: #8b5cf6;
+  --qad-purple-light: #c4b5fd;
+  --qad-blue: #38bdf8;
+  --qad-green: #34d399;
+  --qad-orange: #fb923c;
+  --qad-red: #fb7185;
+
+  color: var(--qad-text);
+  padding-bottom: 35px;
+  animation: qad-enter 0.45s ease both;
 }
 
-.error-banner {
-  margin-bottom: 20px;
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
+@keyframes qad-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Admin Section Cards */
-.admin-section {
-  background: linear-gradient(145deg, rgba(20, 20, 30, 0.85), rgba(12, 12, 18, 0.95));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 32px;
-  margin-bottom: 32px;
-  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(14px);
+/* =========================================================
+   HEADER
+========================================================= */
+
+.qad-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 25px;
+  margin-bottom: 28px;
 }
 
-.admin-section-header {
+.qad-header-content {
+  max-width: 650px;
+}
+
+.qad-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 13px;
+  color: var(--qad-purple-light);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 2px;
+}
+
+.qad-eyebrow-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--qad-purple);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.8);
+}
+
+.qad-header h1 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: clamp(28px, 4vw, 37px);
+  line-height: 1.2;
+  font-weight: 850;
+  letter-spacing: -1.2px;
+}
+
+.qad-header-content > p {
+  margin: 10px 0 0;
+  color: var(--qad-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.qad-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   BUTTON SYSTEM
+========================================================= */
+
+.qad-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 41px;
+  padding: 0 15px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.qad-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.qad-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.qad-button-primary {
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  box-shadow: 0 5px 17px rgba(124, 58, 237, 0.2);
+}
+
+.qad-button-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+  box-shadow: 0 8px 23px rgba(124, 58, 237, 0.35);
+}
+
+.qad-button-secondary {
+  color: #cbd5e1;
+  background: rgba(30, 41, 59, 0.75);
+  border-color: var(--qad-border);
+}
+
+.qad-button-secondary:hover:not(:disabled) {
+  background: #27364e;
+  border-color: rgba(167, 139, 250, 0.35);
+  color: white;
+}
+
+.qad-button-danger {
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.09);
+  border-color: rgba(244, 63, 94, 0.2);
+}
+
+.qad-button-danger:hover:not(:disabled) {
+  background: rgba(244, 63, 94, 0.18);
+  border-color: rgba(244, 63, 94, 0.4);
+}
+
+/* =========================================================
+   ERROR BANNER
+========================================================= */
+
+.qad-error-banner {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.admin-section-header .eyebrow {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #818cf8;
-  margin: 0 0 4px 0;
-}
-
-.admin-section-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 0 0 4px 0;
-}
-
-.admin-section-header p {
-  font-size: 0.9rem;
-  color: #9ca3af;
-  margin: 0;
-}
-
-/* Forms Card */
-.admin-form-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 24px;
-  backdrop-filter: blur(10px);
-}
-
-.admin-form-card h3 {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-top: 0;
-  margin-bottom: 16px;
-}
-
-.admin-form-card input[type="text"],
-.admin-form-card textarea,
-.admin-form-card select {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f3f4f6;
-  padding: 12px 16px;
+  gap: 15px;
+  padding: 15px 18px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(251, 113, 133, 0.25);
   border-radius: 12px;
-  font-size: 0.9rem;
-  margin-bottom: 16px;
-  outline: none;
-  transition: all 0.25s ease;
+  background: rgba(127, 29, 29, 0.14);
 }
 
-.admin-form-card input[type="text"]:focus,
-.admin-form-card textarea:focus,
-.admin-form-card select:focus {
-  border-color: rgba(99, 102, 241, 0.6);
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+.qad-error-banner strong {
+  display: block;
+  color: #fda4af;
+  font-size: 12px;
 }
 
-.admin-form-card select option {
-  background: #12121a;
-  color: #f3f4f6;
+.qad-error-banner p {
+  margin: 5px 0 0;
+  color: #cbd5e1;
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
-.form-action-group {
+.qad-error-banner > button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 7px;
+  background: rgba(251, 113, 133, 0.12);
+  color: #fda4af;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* =========================================================
+   DASHBOARD STATISTICS
+========================================================= */
+
+.qad-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.qad-stat-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--qad-border);
+  border-radius: 14px;
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.45),
+    rgba(15, 23, 42, 0.96)
+  );
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.qad-stat-card:hover {
+  transform: translateY(-4px);
+  background: var(--qad-card-hover);
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+.qad-stat-top {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.checkbox-label {
-  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: #d1d5db;
+  gap: 9px;
+  margin-bottom: 18px;
 }
 
-/* Stat Cards & Clickable */
-.result-stat-card.clickable {
-  cursor: pointer;
-  transition: transform 0.25s ease, border-color 0.25s ease;
+.qad-stat-top > span {
+  color: var(--qad-muted);
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.result-stat-card.clickable:hover {
-  transform: translateY(-3px);
-  border-color: rgba(99, 102, 241, 0.4);
+.qad-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 800;
 }
 
-/* Card Action Buttons inside Challenge / Question */
-.card-action-buttons {
+.qad-stat-icon.purple {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.15);
+}
+
+.qad-stat-icon.blue {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.13);
+}
+
+.qad-stat-icon.green {
+  color: #6ee7b7;
+  background: rgba(52, 211, 153, 0.13);
+}
+
+.qad-stat-icon.orange {
+  color: #fdba74;
+  background: rgba(251, 146, 60, 0.13);
+}
+
+.qad-stat-card > strong {
+  display: block;
+  color: #f8fafc;
+  font-size: 29px;
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: -0.8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.qad-stat-card > p {
+  margin: 9px 0 0;
+  color: #77869c;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   SECTION SYSTEM
+========================================================= */
+
+.qad-section {
+  margin-bottom: 28px;
+}
+
+.qad-section-header {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 16px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 19px;
 }
 
-.delete-button {
-  background: rgba(239, 68, 68, 0.1) !important;
-  color: #f87171 !important;
-  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+.qad-section-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--qad-purple-light);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 1.6px;
 }
 
-.delete-button:hover {
-  background: rgba(239, 68, 68, 0.25) !important;
-  color: #ffffff !important;
+.qad-section-header h2 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.4px;
 }
 
-/* Expanded Sections */
-.expanded-section {
-  margin-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 16px;
+.qad-section-header p {
+  margin: 7px 0 0;
+  color: var(--qad-muted);
+  font-size: 11px;
+  line-height: 1.6;
 }
 
-.nested-card {
-  background: rgba(15, 15, 22, 0.6);
-  margin-bottom: 12px;
+/* =========================================================
+   FORMS
+========================================================= */
+
+.qad-form-card {
+  padding: 23px;
+  margin-bottom: 21px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(139, 92, 246, 0.055),
+      transparent 55%
+    ),
+    var(--qad-card);
+  animation: qad-form-enter 0.3s ease both;
 }
 
-.nested-actions {
-  margin-top: 10px;
+@keyframes qad-form-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Options List */
-.options-list-wrapper {
-  margin-top: 12px;
+.qad-form-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 23px;
+}
+
+.qad-form-heading h3 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.qad-form-step {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  border: 1px solid rgba(167, 139, 250, 0.2);
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.13);
+  color: #c4b5fd;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.qad-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.qad-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
+  min-width: 0;
 }
 
-.option-row {
+.qad-field-full {
+  grid-column: 1 / -1;
+}
+
+.qad-field > span {
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.qad-field input,
+.qad-field textarea,
+.qad-field select {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  outline: none;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 9px;
+  background: #0b1322;
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 12px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.qad-field textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.qad-field input::placeholder,
+.qad-field textarea::placeholder {
+  color: #64748b;
+}
+
+.qad-field input:focus,
+.qad-field textarea:focus,
+.qad-field select:focus {
+  border-color: var(--qad-purple);
+  background: #101a2c;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+.qad-field select option {
+  background: #111a2b;
+  color: white;
+}
+
+.qad-form-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 21px;
+  padding-top: 18px;
+  border-top: 1px solid var(--qad-border);
+}
+
+/* =========================================================
+   CORRECT ANSWER CHECKBOX
+========================================================= */
+
+.qad-correct-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  grid-column: 1 / -1;
+  padding: 15px;
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  border-radius: 10px;
+  background: rgba(52, 211, 153, 0.055);
+  cursor: pointer;
+}
+
+.qad-correct-checkbox input {
+  width: 17px;
+  height: 17px;
+  accent-color: #10b981;
+  cursor: pointer;
+}
+
+.qad-correct-checkbox > span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.qad-correct-checkbox strong {
+  color: #6ee7b7;
+  font-size: 11px;
+}
+
+.qad-correct-checkbox small {
+  color: var(--qad-muted);
+  font-size: 10px;
+}
+
+/* =========================================================
+   CHALLENGE GRID
+========================================================= */
+
+.qad-challenge-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.qad-challenge-card {
+  min-width: 0;
+  padding: 19px;
+  border: 1px solid var(--qad-border);
+  border-radius: 14px;
+  background: var(--qad-card);
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.qad-challenge-card:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  background: var(--qad-card-hover);
+}
+
+.qad-challenge-card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  font-size: 0.875rem;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.add-option-btn {
-  margin-top: 8px;
-  font-size: 0.85rem;
-  padding: 8px 14px;
-}
-
-/* Filter Controls Wrapper inside Admin Dashboard */
-.filter-card {
-  margin-bottom: 24px;
-}
-
-.filter-controls-wrapper {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
+.qad-difficulty {
+  display: inline-flex;
   align-items: center;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.5px;
 }
 
-.admin-search-input {
-  flex: 1;
-  min-width: 240px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f3f4f6;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  outline: none;
+.qad-difficulty.easy {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.12);
 }
 
-.admin-select {
-  min-width: 160px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f3f4f6;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 0.9rem;
+.qad-difficulty.medium {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.qad-difficulty.hard {
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.12);
+}
+
+.qad-difficulty:not(.easy):not(.medium):not(.hard) {
+  color: #cbd5e1;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.qad-challenge-id {
+  color: #8493a9;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.qad-challenge-card > h3 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 16px;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.qad-challenge-description {
+  display: -webkit-box;
+  overflow: hidden;
+  min-height: 40px;
+  margin: 10px 0 15px;
+  color: var(--qad-muted);
+  font-size: 11px;
+  line-height: 1.7;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.qad-challenge-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--qad-border);
+  border-bottom: 1px solid var(--qad-border);
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.qad-challenge-meta strong {
+  color: #cbd5e1;
+}
+
+/* =========================================================
+   CHALLENGE CARD ACTIONS
+========================================================= */
+
+.qad-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.qad-card-actions .qad-button {
+  min-height: 34px;
+  padding: 0 11px;
+  font-size: 10px;
+}
+
+/* =========================================================
+   EXPANDED CHALLENGE PANEL
+========================================================= */
+
+.qad-expanded-panel {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--qad-border);
+  animation: qad-form-enter 0.25s ease both;
+}
+
+.qad-expanded-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.qad-expanded-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.qad-expanded-header h4 {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 12px;
+}
+
+.qad-expanded-header span {
+  color: var(--qad-muted);
+  font-size: 10px;
+}
+
+.qad-mini-button {
+  padding: 8px 11px;
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.11);
+  color: #c4b5fd;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 750;
   cursor: pointer;
-  outline: none;
 }
 
-.admin-select option {
-  background: #12121a;
+.qad-mini-button:hover {
+  background: rgba(139, 92, 246, 0.2);
+}
+
+.qad-nested-empty {
+  padding: 15px;
+  border: 1px dashed rgba(148, 163, 184, 0.2);
+  border-radius: 9px;
+  color: var(--qad-muted);
+  text-align: center;
+  font-size: 10px;
+}
+
+/* =========================================================
+   QUESTION CARDS
+========================================================= */
+
+.qad-question-card {
+  margin-bottom: 11px;
+  padding: 13px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 10px;
+  background: rgba(8, 13, 25, 0.55);
+}
+
+.qad-question-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.qad-question-number {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background: rgba(56, 189, 248, 0.12);
+  color: #7dd3fc;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.qad-question-content > strong {
+  padding-top: 4px;
+  color: #e2e8f0;
+  font-size: 11px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.qad-question-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 13px;
+  margin: 12px 0 0 35px;
+}
+
+.qad-question-actions button,
+.qad-option-actions button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #a78bfa;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.qad-question-actions button:hover,
+.qad-option-actions button:hover {
+  color: #ddd6fe;
+}
+
+.qad-question-actions .qad-danger-text,
+.qad-option-actions .qad-danger-text {
+  color: #fb7185;
+}
+
+/* =========================================================
+   ANSWER OPTIONS
+========================================================= */
+
+.qad-options-panel {
+  margin-top: 14px;
+  padding: 13px;
+  border-radius: 9px;
+  background: rgba(30, 41, 59, 0.38);
+  animation: qad-form-enter 0.2s ease both;
+}
+
+.qad-options-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.qad-options-heading strong {
+  color: #cbd5e1;
+  font-size: 11px;
+}
+
+.qad-options-heading > span {
+  color: var(--qad-muted);
+  font-size: 10px;
+}
+
+.qad-option-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.09);
+}
+
+.qad-option-text {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  color: #cbd5e1;
+  font-size: 10px;
+}
+
+.qad-option-text > span:nth-child(2) {
+  overflow-wrap: anywhere;
+}
+
+.qad-correct-mark {
+  color: #34d399;
+  font-weight: 900;
+}
+
+.qad-incorrect-mark {
+  color: #64748b;
+}
+
+.qad-correct-label {
+  padding: 4px 6px;
+  border-radius: 5px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  font-size: 8px;
+  font-weight: 850;
+}
+
+.qad-option-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 11px;
+}
+
+.qad-add-option {
+  width: 100%;
+  margin-top: 11px;
+  padding: 10px;
+  border: 1px dashed rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.055);
+  color: #c4b5fd;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.qad-add-option:hover {
+  background: rgba(139, 92, 246, 0.13);
+}
+
+/* =========================================================
+   EMPTY STATES
+========================================================= */
+
+.qad-empty-state {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 205px;
+  padding: 30px 20px;
+  border: 1px dashed rgba(148, 163, 184, 0.2);
+  border-radius: 13px;
+  background: rgba(17, 26, 43, 0.55);
+  text-align: center;
+}
+
+.qad-empty-state > span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 14px;
+  border-radius: 13px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #c4b5fd;
+  font-size: 25px;
+}
+
+.qad-empty-state h3 {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.qad-empty-state p {
+  margin: 8px 0 15px;
+  color: var(--qad-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   QUICK ACTIONS
+========================================================= */
+
+.qad-quick-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 20px 22px;
+  margin-bottom: 29px;
+  border: 1px solid rgba(139, 92, 246, 0.19);
+  border-radius: 14px;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(139, 92, 246, 0.1),
+      rgba(56, 189, 248, 0.035)
+    ),
+    var(--qad-card);
+}
+
+.qad-quick-actions h3 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.qad-quick-actions p {
+  margin: 6px 0 0;
+  color: var(--qad-muted);
+  font-size: 10px;
+}
+
+.qad-quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+/* =========================================================
+   SUBMISSION STATISTICS
+========================================================= */
+
+.qad-submission-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.qad-submission-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--qad-border);
+  border-radius: 12px;
+  background: var(--qad-card);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.qad-submission-stat:hover {
+  transform: translateY(-2px);
+  background: var(--qad-card-hover);
+}
+
+.qad-submission-stat.active {
+  border-color: rgba(167, 139, 250, 0.55);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.qad-submission-stat > span {
+  color: var(--qad-muted);
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.qad-submission-stat > strong {
+  color: #f1f5f9;
+  font-size: 25px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.qad-submission-stat.orange.active {
+  border-color: rgba(251, 146, 60, 0.45);
+  background: rgba(251, 146, 60, 0.07);
+}
+
+.qad-submission-stat.green.active {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(52, 211, 153, 0.07);
+}
+
+.qad-submission-stat.red.active {
+  border-color: rgba(251, 113, 133, 0.45);
+  background: rgba(251, 113, 133, 0.07);
+}
+
+/* =========================================================
+   SUBMISSION TOOLBAR
+========================================================= */
+
+.qad-submission-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 170px auto;
+  gap: 10px;
+  padding: 17px;
+  margin-bottom: 19px;
+  border: 1px solid var(--qad-border);
+  border-radius: 12px;
+  background: var(--qad-card);
+}
+
+.qad-submission-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.qad-submission-search > span {
+  position: absolute;
+  left: 13px;
+  color: #8493a9;
+  font-size: 22px;
+  pointer-events: none;
+}
+
+.qad-submission-search input,
+.qad-submission-toolbar select {
+  width: 100%;
+  height: 41px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid rgba(148, 163, 184, 0.17);
+  border-radius: 9px;
+  outline: none;
+  background: #0b1322;
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.qad-submission-search input {
+  padding-left: 40px;
+  padding-right: 38px;
+}
+
+.qad-submission-search input::placeholder {
+  color: #64748b;
+}
+
+.qad-submission-search input:focus,
+.qad-submission-toolbar select:focus {
+  border-color: var(--qad-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.qad-submission-search button {
+  position: absolute;
+  right: 9px;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.qad-submission-toolbar select {
+  cursor: pointer;
+}
+
+.qad-submission-toolbar select option {
+  background: #111a2b;
+  color: white;
+}
+
+/* =========================================================
+   SUBMISSION RESULTS
+========================================================= */
+
+.qad-submission-results {
+  padding: 19px;
+  border: 1px solid var(--qad-border);
+  border-radius: 14px;
+  background: var(--qad-card);
+}
+
+.qad-results-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 17px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--qad-border);
+}
+
+.qad-results-heading strong {
+  color: #e2e8f0;
+  font-size: 13px;
+}
+
+.qad-results-heading span {
+  color: var(--qad-muted);
+  font-size: 10px;
+}
+
+.qad-submission-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* =========================================================
+   SUBMISSION CARD COMPATIBILITY
+   Scoped styling only for common existing card elements
+========================================================= */
+
+.qad-submission-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.qad-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-top: 23px;
+  padding: 14px 2px;
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.8px;
+}
+
+.qad-footer span:last-child {
+  color: #8493a9;
+  letter-spacing: 0.2px;
+}
+
+/* =========================================================
+   LOADING SCREEN
+========================================================= */
+
+.qad-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 30px;
+  border: 1px solid var(--qad-border);
+  border-radius: 15px;
+  background: var(--qad-card);
+  text-align: center;
+}
+
+.qad-spinner {
+  width: 43px;
+  height: 43px;
+  margin-bottom: 20px;
+  border: 3px solid rgba(148, 163, 184, 0.15);
+  border-top-color: var(--qad-purple-light);
+  border-radius: 50%;
+  animation: qad-spin 0.8s linear infinite;
+}
+
+@keyframes qad-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.qad-loading h2 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 17px;
+}
+
+.qad-loading p {
+  margin-top: 9px;
+  color: var(--qad-muted);
+  font-size: 11px;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.qad-page button:focus-visible,
+.qad-page a:focus-visible,
+.qad-page input:focus-visible,
+.qad-page textarea:focus-visible,
+.qad-page select:focus-visible {
+  outline: 2px solid var(--qad-purple-light);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1050px) {
+  .qad-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qad-challenge-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qad-submission-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .qad-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .qad-header-actions {
+    width: 100%;
+  }
+
+  .qad-header-actions .qad-button {
+    flex: 1;
+  }
+
+  .qad-section-header {
+    align-items: flex-start;
+  }
+
+  .qad-section-header > .qad-button {
+    flex-shrink: 0;
+  }
+
+  .qad-form-card {
+    padding: 17px;
+  }
+
+  .qad-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qad-field-full {
+    grid-column: auto;
+  }
+
+  .qad-correct-checkbox {
+    grid-column: auto;
+  }
+
+  .qad-submission-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .qad-submission-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .qad-submission-search {
+    grid-column: 1 / -1;
+  }
+
+  .qad-quick-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .qad-quick-buttons {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 430px) {
+  .qad-header h1 {
+    font-size: 27px;
+  }
+
+  .qad-header-actions {
+    flex-direction: column;
+  }
+
+  .qad-header-actions .qad-button {
+    width: 100%;
+  }
+
+  .qad-stats-grid {
+    gap: 10px;
+  }
+
+  .qad-stat-card {
+    padding: 13px;
+  }
+
+  .qad-stat-card > strong {
+    font-size: 24px;
+  }
+
+  .qad-stat-top > span {
+    font-size: 10px;
+  }
+
+  .qad-stat-icon {
+    width: 29px;
+    height: 29px;
+    font-size: 15px;
+  }
+
+  .qad-section-header {
+    flex-direction: column;
+  }
+
+  .qad-section-header > .qad-button {
+    width: 100%;
+  }
+
+  .qad-challenge-card {
+    padding: 14px;
+  }
+
+  .qad-card-actions .qad-button {
+    flex: 1;
+  }
+
+  .qad-question-actions {
+    margin-left: 0;
+  }
+
+  .qad-option-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .qad-submission-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .qad-submission-search {
+    grid-column: auto;
+  }
+
+  .qad-submission-toolbar > .qad-button {
+    width: 100%;
+  }
+
+  .qad-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .qad-form-actions .qad-button {
+    width: 100%;
+  }
+
+  .qad-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .qad-page,
+  .qad-page *,
+  .qad-page *::before,
+  .qad-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

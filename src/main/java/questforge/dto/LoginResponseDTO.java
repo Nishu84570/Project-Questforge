@@ -1,12 +1,14 @@
 
 package questforge.dto;
 
+import questforge.model.User.Role;
+
 public class LoginResponseDTO {
 
     private Long id;
     private String name;
     private String email;
-    private String role;
+    private Role role;
     private String token;
 
     public LoginResponseDTO() {
@@ -16,7 +18,7 @@ public class LoginResponseDTO {
             Long id,
             String name,
             String email,
-            String role,
+            Role role,
             String token) {
 
         this.id = id;
@@ -50,11 +52,11 @@ public class LoginResponseDTO {
         this.email = email;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

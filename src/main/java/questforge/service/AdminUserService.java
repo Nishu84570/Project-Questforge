@@ -73,28 +73,29 @@ public class AdminUserService {
 
         String normalizedQuery = query.trim();
 
-        Map<Long, User> matchingUsers = new LinkedHashMap<>();
+        Map<Long, AdminUserResponseDTO> matchingUsers = new LinkedHashMap<>();
 
         userRepository
                 .findByNameContainingIgnoreCase(normalizedQuery)
-                .forEach(user -> matchingUsers.put(user.getId(), user));
+                .forEach(user -> matchingUsers.put(user.getUserId(), user));
 
         userRepository
-                .findByEmailContainingIgnoreCase(normalizedQuery)
-                .forEach(user -> matchingUsers.put(user.getId(), user));
+                .findByNameContainingIgnoreCase(normalizedQuery)
+                .forEach(user -> matchingUsers.put(user.getUserId(), user));
 
-        List<User> users = new ArrayList<>(matchingUsers.values());
+        List<AdminUserResponseDTO> users =
+                new ArrayList<>(matchingUsers.values());
 
         users.sort(
                 Comparator.comparing(
-                        User::getName,
+                        AdminUserResponseDTO::getName,
                         Comparator.nullsLast(
                                 String.CASE_INSENSITIVE_ORDER
                         )
                 )
         );
 
-        return buildUserResponses(users);
+        return users;
     }
 
 

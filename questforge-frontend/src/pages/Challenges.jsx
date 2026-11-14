@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../services/api';
@@ -22,12 +23,13 @@ function Challenges() {
         });
 
         if (!response.ok) {
-          setError(data?.message || 'Failed to load challenges');
+          setError(data?.message || 'Failed to load challenges.');
           return;
         }
 
-        setChallenges(data || []);
+        setChallenges(Array.isArray(data) ? data : []);
       } catch (err) {
+        console.error('Challenges loading error:', err);
         setError('Unable to connect to QuestForge backend.');
       } finally {
         setLoading(false);
@@ -38,17 +40,24 @@ function Challenges() {
   }, []);
 
   const difficulties = useMemo(() => {
-    const values = challenges.map((c) => c.difficulty).filter(Boolean);
-    return [...new Set(values)];
+    const values = challenges
+      .map((challenge) => challenge.difficulty)
+      .filter(Boolean);
+
+    return [...new Set(values)].sort();
   }, [challenges]);
 
   const categories = useMemo(() => {
-    const values = challenges.map((c) => c.category).filter(Boolean);
-    return [...new Set(values)];
+    const values = challenges
+      .map((challenge) => challenge.category)
+      .filter(Boolean);
+
+    return [...new Set(values)].sort();
   }, [challenges]);
 
   const filteredChallenges = useMemo(() => {
     let result = [...challenges];
+
     const search = searchTerm.trim().toLowerCase();
 
     if (search) {
@@ -77,6 +86,12 @@ function Challenges() {
       );
     }
 
+    const difficultyOrder = {
+      EASY: 1,
+      MEDIUM: 2,
+      HARD: 3,
+    };
+
     if (sortBy === 'TITLE_ASC') {
       result.sort((a, b) =>
         (a.title || '').localeCompare(b.title || '')
@@ -86,19 +101,27 @@ function Challenges() {
         (b.title || '').localeCompare(a.title || '')
       );
     } else if (sortBy === 'EASY_FIRST') {
-      const order = { EASY: 1, MEDIUM: 2, HARD: 3 };
       result.sort(
-        (a, b) => (order[a.difficulty] || 99) - (order[b.difficulty] || 99)
+        (a, b) =>
+          (difficultyOrder[a.difficulty] || 99) -
+          (difficultyOrder[b.difficulty] || 99)
       );
     } else if (sortBy === 'HARD_FIRST') {
-      const order = { EASY: 1, MEDIUM: 2, HARD: 3 };
       result.sort(
-        (a, b) => (order[b.difficulty] || 99) - (order[a.difficulty] || 99)
+        (a, b) =>
+          (difficultyOrder[b.difficulty] || 0) -
+          (difficultyOrder[a.difficulty] || 0)
       );
     }
 
     return result;
-  }, [challenges, searchTerm, difficultyFilter, categoryFilter, sortBy]);
+  }, [
+    challenges,
+    searchTerm,
+    difficultyFilter,
+    categoryFilter,
+    sortBy,
+  ]);
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -107,13 +130,24 @@ function Challenges() {
     setSortBy('DEFAULT');
   };
 
+  const hasActiveFilters =
+    searchTerm.trim() !== '' ||
+    difficultyFilter !== 'ALL' ||
+    categoryFilter !== 'ALL' ||
+    sortBy !== 'DEFAULT';
+
   if (loading) {
     return (
       <div className="page challenges-page">
-        <div className="empty-card">
-          <div className="loading-spinner"></div>
-          <h2>Loading challenges...</h2>
-          <p>Fetching active coding challenges from QuestForge.</p>
+        <div className="ch-loading-state">
+          <div className="ch-loader">
+            <span />
+            <span />
+            <span />
+          </div>
+
+          <h2>Loading Challenges</h2>
+          <p>Preparing your next coding adventure...</p>
         </div>
       </div>
     );
@@ -122,139 +156,320 @@ function Challenges() {
   if (error) {
     return (
       <div className="page challenges-page">
-        <div className="empty-card error-card-container">
-          <h2>Unable to load challenges</h2>
-          <p className="error-text">{error}</p>
+        <div className="ch-state-card ch-error-state">
+          <div className="ch-state-icon">!</div>
+          <span className="ch-eyebrow">CONNECTION ISSUE</span>
+          <h2>Challenges Unavailable</h2>
+          <p>{error}</p>
+
+          <button
+            type="button"
+            className="ch-button ch-button-primary"
+            onClick={() => window.location.reload()}
+          >
+            Try Again <span>↻</span>
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="page challenges-page">
-      {/* HEADER */}
-      <div className="challenges-header">
-        <div>
-          <p className="eyebrow">QUESTFORGE</p>
-          <h1>Challenges</h1>
-          <p>Choose a challenge and prove your skills.</p>
+    <main className="page challenges-page">
+
+      {/* HERO SECTION */}
+      <section className="ch-hero">
+        <div className="ch-hero-content">
+          <div className="ch-hero-badge">
+            <span className="ch-hero-badge-dot" />
+            QUESTFORGE CHALLENGE ARENA
+          </div>
+
+          <h1>
+            Level Up Your
+            <br />
+            <span>Coding Skills.</span>
+          </h1>
+
+          <p className="ch-hero-description">
+            Explore coding challenges, sharpen your problem-solving skills,
+            and prove what you're capable of.
+          </p>
+
+          <div className="ch-hero-actions">
+            <a href="#challenge-explorer" className="ch-button ch-button-primary">
+              Explore Challenges <span>↓</span>
+            </a>
+
+            <Link to="/leaderboard" className="ch-button ch-button-glass">
+              🏆 Leaderboard
+            </Link>
+          </div>
         </div>
 
-        <div className="challenges-header-actions">
-          <Link className="secondary-button" to="/leaderboard">
-            🏆 Leaderboard
-          </Link>
-          <Link className="secondary-button" to="/submissions">
-            My Submissions
+        <div className="ch-hero-visual" aria-hidden="true">
+          <div className="ch-orbit ch-orbit-one" />
+          <div className="ch-orbit ch-orbit-two" />
+
+          <div className="ch-code-window">
+            <div className="ch-code-header">
+              <div className="ch-window-dots">
+                <span />
+                <span />
+                <span />
+              </div>
+              <span>questforge.java</span>
+            </div>
+
+            <div className="ch-code-body">
+              <p><span>01</span> <i>public class</i> QuestForge {'{'}</p>
+              <p><span>02</span> &nbsp; <i>public static void</i> levelUp() {'{'}</p>
+              <p><span>03</span> &nbsp;&nbsp; skills.improve();</p>
+              <p><span>04</span> &nbsp;&nbsp; challenges.solve();</p>
+              <p><span>05</span> &nbsp;&nbsp; <b>return</b> SUCCESS;</p>
+              <p><span>06</span> &nbsp; {'}'}</p>
+              <p><span>07</span> {'}'}</p>
+            </div>
+
+            <div className="ch-code-footer">
+              <span className="ch-code-status-dot" />
+              READY TO CODE
+            </div>
+          </div>
+
+          <div className="ch-floating-symbol ch-symbol-one">⌘</div>
+          <div className="ch-floating-symbol ch-symbol-two">✦</div>
+          <div className="ch-floating-symbol ch-symbol-three">{'</>'}</div>
+        </div>
+
+        <div className="ch-hero-bottom">
+          <span>THINK</span>
+          <span className="ch-hero-line" />
+          <span>CODE</span>
+          <span className="ch-hero-line" />
+          <span>CONQUER</span>
+        </div>
+      </section>
+
+      {/* QUICK OVERVIEW */}
+      <section className="ch-overview">
+        <div className="ch-overview-item">
+          <span className="ch-overview-icon">◈</span>
+          <div>
+            <strong>{challenges.length}</strong>
+            <span>Available Challenges</span>
+          </div>
+        </div>
+
+        <div className="ch-overview-divider" />
+
+        <div className="ch-overview-item">
+          <span className="ch-overview-icon ch-icon-blue">⌘</span>
+          <div>
+            <strong>{categories.length}</strong>
+            <span>Categories</span>
+          </div>
+        </div>
+
+        <div className="ch-overview-divider" />
+
+        <div className="ch-overview-item">
+          <span className="ch-overview-icon ch-icon-green">✧</span>
+          <div>
+            <strong>{difficulties.length}</strong>
+            <span>Difficulty Levels</span>
+          </div>
+        </div>
+
+        <div className="ch-overview-divider" />
+
+        <div className="ch-overview-item">
+          <span className="ch-overview-icon ch-icon-orange">⚡</span>
+          <div>
+            <strong>∞</strong>
+            <span>Room to Improve</span>
+          </div>
+        </div>
+      </section>
+
+      {/* CHALLENGE EXPLORER */}
+      <section className="ch-explorer" id="challenge-explorer">
+
+        <div className="ch-section-header">
+          <div>
+            <span className="ch-eyebrow">YOUR NEXT ADVENTURE</span>
+            <h2>Explore Challenges</h2>
+            <p>Find the right challenge and push your limits.</p>
+          </div>
+
+          <Link to="/submissions" className="ch-submissions-link">
+            My Submissions <span>↗</span>
           </Link>
         </div>
-      </div>
 
-      {/* FILTERS BAR */}
-      {challenges.length > 0 && (
-        <div className="admin-form-card challenge-filters-card">
-          <div className="challenge-filters">
-            <input
-              type="text"
-              placeholder="Search challenges..."
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              className="challenge-search-input"
-            />
+        {/* FILTER PANEL */}
+        {challenges.length > 0 && (
+          <div className="ch-filter-panel">
+            <div className="ch-filter-heading">
+              <div>
+                <span className="ch-filter-icon">⌕</span>
+                <strong>Find Your Challenge</strong>
+              </div>
 
-            <select
-              value={difficultyFilter}
-              onChange={(event) => setDifficultyFilter(event.target.value)}
-              className="challenge-select"
-            >
-              <option value="ALL">All Difficulties</option>
-              {difficulties.map((difficulty) => (
-                <option key={difficulty} value={difficulty}>
-                  {difficulty}
-                </option>
-              ))}
-            </select>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  className="ch-clear-button"
+                  onClick={clearFilters}
+                >
+                  Reset Filters <span>↻</span>
+                </button>
+              )}
+            </div>
 
-            <select
-              value={categoryFilter}
-              onChange={(event) => setCategoryFilter(event.target.value)}
-              className="challenge-select"
-            >
-              <option value="ALL">All Categories</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
+            <div className="ch-filter-controls">
+              <div className="ch-search-wrapper">
+                <span className="ch-search-icon">⌕</span>
 
-            <select
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value)}
-              className="challenge-select"
-            >
-              <option value="DEFAULT">Default Order</option>
-              <option value="TITLE_ASC">Title: A → Z</option>
-              <option value="TITLE_DESC">Title: Z → A</option>
-              <option value="EASY_FIRST">Easy → Hard</option>
-              <option value="HARD_FIRST">Hard → Easy</option>
-            </select>
+                <input
+                  type="search"
+                  placeholder="Search by title, description or category..."
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  className="ch-search-input"
+                  aria-label="Search challenges"
+                />
+
+                {searchTerm && (
+                  <button
+                    type="button"
+                    className="ch-search-clear"
+                    onClick={() => setSearchTerm('')}
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              <select
+                value={difficultyFilter}
+                onChange={(event) => setDifficultyFilter(event.target.value)}
+                className="ch-select"
+                aria-label="Filter by difficulty"
+              >
+                <option value="ALL">All Difficulties</option>
+                {difficulties.map((difficulty) => (
+                  <option key={difficulty} value={difficulty}>
+                    {difficulty}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={categoryFilter}
+                onChange={(event) => setCategoryFilter(event.target.value)}
+                className="ch-select"
+                aria-label="Filter by category"
+              >
+                <option value="ALL">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value)}
+                className="ch-select"
+                aria-label="Sort challenges"
+              >
+                <option value="DEFAULT">Recommended</option>
+                <option value="TITLE_ASC">Name: A – Z</option>
+                <option value="TITLE_DESC">Name: Z – A</option>
+                <option value="EASY_FIRST">Easy to Hard</option>
+                <option value="HARD_FIRST">Hard to Easy</option>
+              </select>
+            </div>
+
+            <div className="ch-filter-footer">
+              <span>
+                Showing <strong>{filteredChallenges.length}</strong> of{' '}
+                <strong>{challenges.length}</strong> challenges
+              </span>
+
+              {hasActiveFilters && (
+                <span className="ch-active-filter-label">
+                  Filters Applied
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* CHALLENGE CONTENT */}
+        {challenges.length === 0 ? (
+          <div className="ch-state-card">
+            <div className="ch-state-icon">⌘</div>
+            <h2>No Challenges Yet</h2>
+            <p>New coding challenges will appear here when they become available.</p>
+          </div>
+        ) : filteredChallenges.length === 0 ? (
+          <div className="ch-state-card">
+            <div className="ch-state-icon">⌕</div>
+            <h2>No Matching Challenges</h2>
+            <p>We couldn't find anything matching your current filters.</p>
 
             <button
               type="button"
-              className="secondary-button"
+              className="ch-button ch-button-primary"
               onClick={clearFilters}
             >
-              Clear
+              Clear All Filters <span>↻</span>
             </button>
           </div>
-        </div>
-      )}
-
-      {/* CONTENT STATES */}
-      {challenges.length === 0 ? (
-        <div className="empty-card">
-          <h2>No challenges available</h2>
-          <p>Check back later for new challenges.</p>
-        </div>
-      ) : filteredChallenges.length === 0 ? (
-        <div className="empty-card">
-          <h2>No matching challenges</h2>
-          <p>Try changing your search or filters.</p>
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={clearFilters}
-            style={{ marginTop: '16px' }}
-          >
-            Clear Filters
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="challenge-results-info">
-            Showing{' '}
-            <strong>{filteredChallenges.length}</strong> of{' '}
-            <strong>{challenges.length}</strong> challenges
-          </div>
-
-          <div className="challenge-grid">
+        ) : (
+          <div className="ch-challenge-grid">
             {filteredChallenges.map((challenge) => (
-              <div key={challenge.id} className="challenge-card-wrapper">
+              <article
+                key={challenge.id}
+                className="ch-challenge-wrapper"
+              >
                 <ChallengeCard challenge={challenge} />
 
                 <Link
-                  className="secondary-button leaderboard-card-button"
+                  className="ch-leaderboard-button"
                   to={`/leaderboard?challengeId=${challenge.id}`}
                 >
-                  🏆 View Leaderboard
+                  <span>🏆</span>
+                  View Challenge Leaderboard
+                  <span className="ch-leaderboard-arrow">↗</span>
                 </Link>
-              </div>
+              </article>
             ))}
           </div>
-        </>
-      )}
-    </div>
+        )}
+
+      </section>
+
+      {/* BOTTOM CTA */}
+      <section className="ch-bottom-cta">
+        <div className="ch-cta-decoration">✦</div>
+
+        <div>
+          <span className="ch-eyebrow">KEEP THE MOMENTUM</span>
+          <h2>Your progress starts with one challenge.</h2>
+          <p>Keep learning, keep solving, and keep getting better.</p>
+        </div>
+
+        <Link to="/submissions" className="ch-button ch-button-primary">
+          Track My Progress <span>→</span>
+        </Link>
+      </section>
+
+    </main>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../services/api';
 import '../styles/Notifications.css';
@@ -6,15 +6,33 @@ import '../styles/Notifications.css';
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
 
   const [filter, setFilter] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-  const [actionLoading, setActionLoading] = useState(false);
 
-  
-  const fetchNotifications = async () => {
-    setLoading(true);
+  const [busyNotificationIds, setBusyNotificationIds] = useState([]);
+  const [markingAll, setMarkingAll] = useState(false);
+
+  const unreadCount = useMemo(
+    () => notifications.filter((item) => !item.read).length,
+    [notifications]
+  );
+
+  const readCount = notifications.length - unreadCount;
+
+  const dispatchNotificationChange = () => {
+    window.dispatchEvent(new Event('questforge-notification-change'));
+  };
+
+  const fetchNotifications = useCallback(async (showRefresh = false) => {
+    if (showRefresh) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+
     setError('');
 
     try {
@@ -27,50 +45,58 @@ function Notifications() {
         return;
       }
 
-      setNotifications(Array.isArray(data) ? data : []);
+      if (!Array.isArray(data)) {
+        setError('Unexpected response received from the server.');
+        return;
+      }
+
+      setNotifications(data);
+      dispatchNotificationChange();
     } catch (err) {
+      console.error('Notification fetch error:', err);
       setError('Unable to connect to QuestForge backend.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
 
-  
-  const unreadCount = useMemo(
-    () => notifications.filter((notification) => !notification.read).length,
-    [notifications]
-  );
+    const handleNotificationChange = () => {
+      fetchNotifications(true);
+    };
 
-  const readCount = notifications.length - unreadCount;
+    window.addEventListener(
+      'questforge-notification-change',
+      handleNotificationChange
+    );
 
-  
-  const filteredNotifications = useMemo(() => {
-    const search = searchTerm.trim().toLowerCase();
-
-    return notifications.filter((notification) => {
-      const matchesFilter =
-        filter === 'ALL' ||
-        (filter === 'UNREAD' && !notification.read) ||
-        (filter === 'READ' && notification.read);
-
-      if (!matchesFilter) return false;
-      if (!search) return true;
-
-      return (
-        notification.title?.toLowerCase().includes(search) ||
-        notification.message?.toLowerCase().includes(search) ||
-        notification.type?.toLowerCase().includes(search)
+    return () => {
+      window.removeEventListener(
+        'questforge-notification-change',
+        handleNotificationChange
       );
-    });
-  }, [notifications, filter, searchTerm]);
+    };
+  }, [fetchNotifications]);
 
- 
+  const setNotificationBusy = (notificationId, busy) => {
+    setBusyNotificationIds((current) => {
+      if (busy) {
+        return current.includes(notificationId)
+          ? current
+          : [...current, notificationId];
+      }
+
+      return current.filter((id) => id !== notificationId);
+    });
+  };
+
   const markAsRead = async (notificationId) => {
-    setActionLoading(true);
+    if (busyNotificationIds.includes(notificationId)) return;
+
+    setNotificationBusy(notificationId, true);
     setError('');
 
     try {
@@ -92,21 +118,19 @@ function Notifications() {
         )
       );
 
-      window.dispatchEvent(
-        new Event('questforge-notification-change')
-      );
+      dispatchNotificationChange();
     } catch (err) {
+      console.error('Mark notification as read error:', err);
       setError('Unable to connect to QuestForge backend.');
     } finally {
-      setActionLoading(false);
+      setNotificationBusy(notificationId, false);
     }
   };
 
-  
   const markAllAsRead = async () => {
-    if (unreadCount === 0) return;
+    if (unreadCount === 0 || markingAll) return;
 
-    setActionLoading(true);
+    setMarkingAll(true);
     setError('');
 
     try {
@@ -126,22 +150,25 @@ function Notifications() {
         }))
       );
 
-      window.dispatchEvent(
-        new Event('questforge-notification-change')
-      );
+      dispatchNotificationChange();
     } catch (err) {
+      console.error('Mark all notifications as read error:', err);
       setError('Unable to connect to QuestForge backend.');
     } finally {
-      setActionLoading(false);
+      setMarkingAll(false);
     }
   };
 
-  
   const deleteNotification = async (notificationId) => {
-    const confirmed = window.confirm('Delete this notification?');
+    if (busyNotificationIds.includes(notificationId)) return;
+
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this notification?'
+    );
+
     if (!confirmed) return;
 
-    setActionLoading(true);
+    setNotificationBusy(notificationId, true);
     setError('');
 
     try {
@@ -159,13 +186,12 @@ function Notifications() {
         current.filter((notification) => notification.id !== notificationId)
       );
 
-      window.dispatchEvent(
-        new Event('questforge-notification-change')
-      );
+      dispatchNotificationChange();
     } catch (err) {
+      console.error('Delete notification error:', err);
       setError('Unable to connect to QuestForge backend.');
     } finally {
-      setActionLoading(false);
+      setNotificationBusy(notificationId, false);
     }
   };
 
@@ -174,260 +200,438 @@ function Notifications() {
     setSearchTerm('');
   };
 
+  const filteredNotifications = useMemo(() => {
+    const search = searchTerm.trim().toLowerCase();
+
+    return notifications.filter((notification) => {
+      const matchesFilter =
+        filter === 'ALL' ||
+        (filter === 'UNREAD' && !notification.read) ||
+        (filter === 'READ' && notification.read);
+
+      if (!matchesFilter) return false;
+      if (!search) return true;
+
+      const title = String(notification.title || '').toLowerCase();
+      const message = String(notification.message || '').toLowerCase();
+      const type = String(notification.type || '').toLowerCase();
+
+      return (
+        title.includes(search) ||
+        message.includes(search) ||
+        type.includes(search)
+      );
+    });
+  }, [notifications, filter, searchTerm]);
+
   const getNotificationIcon = (type) => {
-    const normalized = type?.toLowerCase().trim();
-    if (normalized?.includes('success')) return '✓';
-    if (normalized?.includes('warning')) return '⚠';
-    if (normalized?.includes('error')) return '!';
-    if (normalized?.includes('challenge')) return '⚔';
-    if (normalized?.includes('submission')) return '⌁';
-    if (normalized?.includes('leaderboard')) return '🏆';
+    const normalized = String(type || '').toLowerCase().trim();
+
+    if (normalized.includes('success')) return '✓';
+    if (normalized.includes('warning')) return '⚠';
+    if (normalized.includes('error')) return '!';
+    if (normalized.includes('challenge')) return '⚔';
+    if (normalized.includes('submission')) return '⌁';
+    if (normalized.includes('leaderboard')) return '🏆';
+    if (normalized.includes('achievement')) return '🏅';
+    if (normalized.includes('streak')) return '🔥';
+    if (normalized.includes('quest')) return '🎯';
+
     return '🔔';
   };
 
   const getNotificationType = (type) => {
-    if (!type) return 'Update';
-    return type
-      .replaceAll('_', ' ')
-      .replaceAll('-', ' ')
+    if (!type) return 'General Update';
+
+    return String(type)
+      .replace(/[_-]+/g, ' ')
       .toLowerCase()
       .replace(/\b\w/g, (letter) => letter.toUpperCase());
   };
 
+  const formatNotificationDate = (createdAt) => {
+    if (!createdAt) return 'Date unavailable';
+
+    const date = new Date(createdAt);
+
+    if (Number.isNaN(date.getTime())) {
+      return 'Date unavailable';
+    }
+
+    return date.toLocaleString(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+  };
+
   if (loading) {
     return (
-      <div className="page notifications-page">
-        <div className="notifications-empty-card">
-          <div className="notification-empty-icon">🔔</div>
-          <div className="loading-spinner"></div>
-          <h2>Loading Notifications</h2>
-          <p>Checking your latest QuestForge updates...</p>
-        </div>
-      </div>
+      <main className="page notifications-page">
+        <section className="notifications-loading-card">
+          <div className="notifications-loading-icon">🔔</div>
+          <div className="notifications-spinner" />
+          <h2>Loading your notifications</h2>
+          <p>Getting your latest QuestForge updates ready...</p>
+
+          <div className="notification-skeleton-list">
+            <div className="notification-skeleton" />
+            <div className="notification-skeleton" />
+            <div className="notification-skeleton" />
+          </div>
+        </section>
+      </main>
     );
   }
 
   if (error && notifications.length === 0) {
     return (
-      <div className="page notifications-page">
-        <div className="notifications-empty-card">
+      <main className="page notifications-page">
+        <section className="notifications-empty-card">
           <div className="notification-empty-icon error">!</div>
-          <h2>Something went wrong</h2>
-          <p className="error-text">{error}</p>
+          <span className="notifications-eyebrow">QUESTFORGE</span>
+          <h2>Unable to load notifications</h2>
+          <p>{error}</p>
+
           <button
             type="button"
-            className="primary-button"
-            onClick={fetchNotifications}
+            className="notification-primary-button"
+            onClick={() => fetchNotifications()}
           >
+            <span>↻</span>
             Try Again
           </button>
-        </div>
-      </div>
+        </section>
+      </main>
     );
   }
 
   return (
-    <div className="page notifications-page">
-      {/* HEADER */}
-      <div className="notifications-header">
+    <main className="page notifications-page">
+      {/* PAGE HEADER */}
+      <section className="notifications-header">
+        <div className="notifications-header-glow" />
+
         <div className="notifications-title">
-          <div className="notifications-title-icon">🔔</div>
-          <div>
-            <p className="eyebrow">QUESTFORGE</p>
+          <div className="notifications-title-icon" aria-hidden="true">
+            🔔
+            {unreadCount > 0 && (
+              <span className="header-unread-dot" />
+            )}
+          </div>
+
+          <div className="notifications-heading-content">
+            <span className="notifications-eyebrow">
+              QUESTFORGE / YOUR ACTIVITY
+            </span>
+
             <h1>Notifications</h1>
-            <p>Stay updated with your latest QuestForge activity.</p>
+
+            <p>
+              Stay connected with your coding journey and latest achievements.
+            </p>
           </div>
         </div>
 
         <div className="notifications-header-actions">
-          <Link className="secondary-button" to="/profile">
-            Profile
-          </Link>
           <button
             type="button"
-            className="primary-button mark-all-btn"
-            onClick={markAllAsRead}
-            disabled={unreadCount === 0 || actionLoading}
+            className="notification-secondary-button refresh-button"
+            onClick={() => fetchNotifications(true)}
+            disabled={refreshing}
           >
-            ✓ Mark All Read
+            <span className={refreshing ? 'refresh-icon is-spinning' : 'refresh-icon'}>
+              ↻
+            </span>
+            {refreshing ? 'Refreshing' : 'Refresh'}
+          </button>
+
+          <Link className="notification-secondary-button" to="/profile">
+            <span>◉</span>
+            Profile
+          </Link>
+
+          <button
+            type="button"
+            className="notification-primary-button"
+            onClick={markAllAsRead}
+            disabled={unreadCount === 0 || markingAll}
+          >
+            <span>✓</span>
+            {markingAll ? 'Updating...' : 'Mark All Read'}
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* ERROR BANNER */}
+      {/* ERROR MESSAGE */}
       {error && (
-        <div className="notification-error-banner">
-          <span>⚠</span>
-          {error}
+        <div className="notification-error-banner" role="alert">
+          <span className="error-banner-icon">⚠</span>
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={() => setError('')}
+            aria-label="Dismiss error"
+          >
+            ×
+          </button>
         </div>
       )}
 
-      {/* SUMMARY STATS */}
-      <div className="notification-summary">
-        <div className="notification-summary-card">
+      {/* SUMMARY CARDS */}
+      <section className="notification-summary">
+        <article className="notification-summary-card total-summary">
           <div className="notification-summary-icon">🔔</div>
-          <div>
-            <span>Total</span>
+          <div className="notification-summary-info">
+            <span>Total Notifications</span>
             <strong>{notifications.length}</strong>
+            <small>Your QuestForge updates</small>
           </div>
-        </div>
+        </article>
 
-        <div className="notification-summary-card unread-summary">
+        <article className="notification-summary-card unread-summary">
           <div className="notification-summary-icon">●</div>
-          <div>
-            <span>Unread</span>
+          <div className="notification-summary-info">
+            <span>Unread Notifications</span>
             <strong>{unreadCount}</strong>
+            <small>Waiting for your attention</small>
           </div>
-        </div>
+        </article>
 
-        <div className="notification-summary-card">
+        <article className="notification-summary-card read-summary">
           <div className="notification-summary-icon">✓</div>
-          <div>
-            <span>Read</span>
+          <div className="notification-summary-info">
+            <span>Read Notifications</span>
             <strong>{readCount}</strong>
+            <small>Already checked</small>
           </div>
-        </div>
-      </div>
+        </article>
+      </section>
 
       {/* TOOLBAR */}
       {notifications.length > 0 && (
-        <div className="notifications-toolbar">
-          <div className="notification-search">
-            <span>🔎</span>
-            <input
-              type="text"
-              placeholder="Search notifications..."
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-              className="notification-search-input"
-            />
+        <section className="notifications-toolbar">
+          <div className="notification-toolbar-heading">
+            <div>
+              <span className="notifications-eyebrow">YOUR INBOX</span>
+              <h2>All Updates</h2>
+            </div>
+
+            <span className="notification-results-count">
+              {filteredNotifications.length} of {notifications.length}
+            </span>
           </div>
 
-          <div className="notification-filter">
-            <button
-              type="button"
-              className={filter === 'ALL' ? 'active' : ''}
-              onClick={() => setFilter('ALL')}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              className={filter === 'UNREAD' ? 'active' : ''}
-              onClick={() => setFilter('UNREAD')}
-            >
-              Unread
-              {unreadCount > 0 && <span>{unreadCount}</span>}
-            </button>
-            <button
-              type="button"
-              className={filter === 'READ' ? 'active' : ''}
-              onClick={() => setFilter('READ')}
-            >
-              Read
-            </button>
-          </div>
+          <div className="notification-toolbar-controls">
+            <label className="notification-search">
+              <span className="notification-search-icon" aria-hidden="true">
+                ⌕
+              </span>
 
-          {(filter !== 'ALL' || searchTerm) && (
-            <button
-              type="button"
-              className="notification-clear-button secondary-button"
-              onClick={clearFilters}
-            >
-              Clear
-            </button>
-          )}
-        </div>
-      )}
+              <input
+                type="search"
+                placeholder="Search notifications..."
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+                className="notification-search-input"
+                aria-label="Search notifications"
+              />
 
-      {/* EMPTY / LIST */}
-      {notifications.length === 0 ? (
-        <div className="notifications-empty-card">
-          <div className="notification-empty-icon">🎉</div>
-          <h2>You're all caught up</h2>
-          <p>
-            You don't have any notifications yet. We'll let you know when
-            something happens.
-          </p>
-        </div>
-      ) : filteredNotifications.length === 0 ? (
-        <div className="notifications-empty-card">
-          <div className="notification-empty-icon">🔎</div>
-          <h2>No matching notifications</h2>
-          <p>Try changing your search or filter.</p>
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={clearFilters}
-            style={{ marginTop: '16px' }}
-          >
-            Reset Filters
-          </button>
-        </div>
-      ) : (
-        <div className="notification-list">
-          {filteredNotifications.map((notification) => (
-            <article
-              key={notification.id}
-              className={`notification-item ${
-                notification.read ? 'notification-read' : 'notification-unread'
-              }`}
-            >
-              <div className="notification-icon">
-                {getNotificationIcon(notification.type)}
-              </div>
-
-              <div className="notification-content">
-                <div className="notification-meta">
-                  <span className="notification-type">
-                    {getNotificationType(notification.type)}
-                  </span>
-                  {!notification.read && (
-                    <span className="notification-new-badge">NEW</span>
-                  )}
-                </div>
-
-                <h3>{notification.title || 'QuestForge Notification'}</h3>
-                <p>{notification.message || 'You have a new QuestForge update.'}</p>
-
-                <div className="notification-time">
-                  <span>◷</span>
-                  <span>
-                    {notification.createdAt
-                      ? new Date(notification.createdAt).toLocaleString()
-                      : 'Unknown'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="notification-actions">
-                {!notification.read && (
-                  <button
-                    type="button"
-                    className="notification-action-button mark-read-button"
-                    onClick={() => markAsRead(notification.id)}
-                    disabled={actionLoading}
-                    title="Mark as read"
-                  >
-                    ✓
-                  </button>
-                )}
-
+              {searchTerm && (
                 <button
                   type="button"
-                  className="notification-action-button delete-button"
-                  onClick={() => deleteNotification(notification.id)}
-                  disabled={actionLoading}
-                  title="Delete notification"
+                  className="notification-search-clear"
+                  onClick={() => setSearchTerm('')}
+                  aria-label="Clear search"
                 >
                   ×
                 </button>
-              </div>
-            </article>
-          ))}
-        </div>
+              )}
+            </label>
+
+            <div className="notification-filter" aria-label="Filter notifications">
+              <button
+                type="button"
+                className={filter === 'ALL' ? 'active' : ''}
+                onClick={() => setFilter('ALL')}
+                aria-pressed={filter === 'ALL'}
+              >
+                All
+                <span className="filter-count">{notifications.length}</span>
+              </button>
+
+              <button
+                type="button"
+                className={filter === 'UNREAD' ? 'active' : ''}
+                onClick={() => setFilter('UNREAD')}
+                aria-pressed={filter === 'UNREAD'}
+              >
+                Unread
+                {unreadCount > 0 && (
+                  <span className="filter-count">{unreadCount}</span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                className={filter === 'READ' ? 'active' : ''}
+                onClick={() => setFilter('READ')}
+                aria-pressed={filter === 'READ'}
+              >
+                Read
+              </button>
+            </div>
+
+            {(filter !== 'ALL' || searchTerm) && (
+              <button
+                type="button"
+                className="notification-clear-button"
+                onClick={clearFilters}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        </section>
       )}
-    </div>
+
+      {/* NOTIFICATION CONTENT */}
+      {notifications.length === 0 ? (
+        <section className="notifications-empty-card">
+          <div className="notification-empty-illustration">🎉</div>
+          <span className="notifications-eyebrow">INBOX ZERO</span>
+          <h2>You're all caught up!</h2>
+          <p>
+            You don't have any notifications yet. Your achievements and
+            important QuestForge updates will appear here.
+          </p>
+          <Link to="/" className="notification-primary-button">
+            Explore QuestForge
+            <span>→</span>
+          </Link>
+        </section>
+      ) : filteredNotifications.length === 0 ? (
+        <section className="notifications-empty-card">
+          <div className="notification-empty-illustration">⌕</div>
+          <span className="notifications-eyebrow">NO RESULTS</span>
+          <h2>No matching notifications</h2>
+          <p>
+            We couldn't find anything matching your current search or filter.
+            Try adjusting your search.
+          </p>
+
+          <button
+            type="button"
+            className="notification-secondary-button"
+            onClick={clearFilters}
+          >
+            Reset Filters
+          </button>
+        </section>
+      ) : (
+        <section className="notification-list" aria-label="Notification list">
+          {filteredNotifications.map((notification) => {
+            const isBusy = busyNotificationIds.includes(notification.id);
+
+            return (
+              <article
+                key={notification.id}
+                className={`notification-item ${
+                  notification.read
+                    ? 'notification-read'
+                    : 'notification-unread'
+                } ${isBusy ? 'notification-is-busy' : ''}`}
+              >
+                <div
+                  className={`notification-icon ${
+                    notification.read ? '' : 'notification-icon-unread'
+                  }`}
+                  aria-hidden="true"
+                >
+                  {getNotificationIcon(notification.type)}
+                </div>
+
+                <div className="notification-content">
+                  <div className="notification-meta">
+                    <span className="notification-type">
+                      {getNotificationType(notification.type)}
+                    </span>
+
+                    {!notification.read && (
+                      <span className="notification-new-badge">NEW</span>
+                    )}
+
+                    {notification.read && (
+                      <span className="notification-read-label">
+                        ✓ Read
+                      </span>
+                    )}
+                  </div>
+
+                  <h3>
+                    {notification.title || 'QuestForge Notification'}
+                  </h3>
+
+                  <p>
+                    {notification.message ||
+                      'You have a new QuestForge update.'}
+                  </p>
+
+                  <div className="notification-time">
+                    <span aria-hidden="true">◷</span>
+                    <time
+                      dateTime={
+                        notification.createdAt
+                          ? new Date(notification.createdAt).toISOString()
+                          : undefined
+                      }
+                    >
+                      {formatNotificationDate(notification.createdAt)}
+                    </time>
+                  </div>
+                </div>
+
+                <div className="notification-actions">
+                  {!notification.read && (
+                    <button
+                      type="button"
+                      className="notification-action-button mark-read-button"
+                      onClick={() => markAsRead(notification.id)}
+                      disabled={isBusy || markingAll}
+                      title="Mark as read"
+                      aria-label="Mark notification as read"
+                    >
+                      {isBusy ? '…' : '✓'}
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    className="notification-action-button delete-button"
+                    onClick={() => deleteNotification(notification.id)}
+                    disabled={isBusy || markingAll}
+                    title="Delete notification"
+                    aria-label="Delete notification"
+                  >
+                    {isBusy ? '…' : '×'}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      )}
+
+      {/* FOOTER */}
+      {notifications.length > 0 && (
+        <footer className="notifications-footer">
+          <span className="notifications-footer-icon">✦</span>
+          <p>
+            You're viewing your QuestForge notifications.
+            <span> Keep building, keep growing.</span>
+          </p>
+        </footer>
+      )}
+    </main>
   );
 }
 

@@ -81,11 +81,17 @@ public class UserProfileController {
         MediaType mediaType;
         if (MediaType.IMAGE_JPEG_VALUE.equalsIgnoreCase(contentType)) {
             mediaType = MediaType.IMAGE_JPEG;
-        } else if (MediaType.IMAGE_PNG_VALUE.equalsIgnoreCase(contentType)) {
+        } 
+        
+        else if (MediaType.IMAGE_PNG_VALUE.equalsIgnoreCase(contentType)) {
             mediaType = MediaType.IMAGE_PNG;
-        } else if ("image/webp".equalsIgnoreCase(contentType)) {
+        } 
+        
+        else if ("image/webp".equalsIgnoreCase(contentType)) {
             mediaType = MediaType.parseMediaType("image/webp");
-        } else {
+        } 
+        
+        else {
             throw new ResponseStatusException(
                     HttpStatus.UNSUPPORTED_MEDIA_TYPE,
                     "Unsupported profile image type"

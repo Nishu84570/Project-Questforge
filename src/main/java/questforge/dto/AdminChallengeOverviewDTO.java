@@ -13,11 +13,12 @@ public class AdminChallengeOverviewDTO {
     private long uniqueParticipants;
 
     private double averageScore;
-    private Integer highestScore;
-    private Integer lowestScore;
+    private Long highestScore;
+    private Long lowestScore;
     private double completionRate;
 
-    public AdminChallengeOverviewDTO() {}
+    public AdminChallengeOverviewDTO() {
+    }
 
     public AdminChallengeOverviewDTO(
             Long challengeId,
@@ -28,8 +29,8 @@ public class AdminChallengeOverviewDTO {
             long firstSubmissions,
             long uniqueParticipants,
             double averageScore,
-            Integer highestScore,
-            Integer lowestScore,
+            Long highestScore,
+            Long lowestScore,
             double completionRate) {
 
         this.challengeId = challengeId;
@@ -43,12 +44,6 @@ public class AdminChallengeOverviewDTO {
         this.highestScore = highestScore;
         this.lowestScore = lowestScore;
         this.completionRate = completionRate;
-    }
-
-    public AdminChallengeOverviewDTO(Long id, String title2, String difficulty2, String category2,
-            long totalSubmissions2, long firstSubmissionCount, long uniqueParticipants2, double averageScore2,
-            Long highestScore2, Long lowestScore2, double completionRate2) {
-        //TODO Auto-generated constructor stub
     }
 
     public Long getChallengeId() {
@@ -115,19 +110,19 @@ public class AdminChallengeOverviewDTO {
         this.averageScore = averageScore;
     }
 
-    public Integer getHighestScore() {
+    public Long getHighestScore() {
         return highestScore;
     }
 
-    public void setHighestScore(Integer highestScore) {
+    public void setHighestScore(Long highestScore) {
         this.highestScore = highestScore;
     }
 
-    public Integer getLowestScore() {
+    public Long getLowestScore() {
         return lowestScore;
     }
 
-    public void setLowestScore(Integer lowestScore) {
+    public void setLowestScore(Long lowestScore) {
         this.lowestScore = lowestScore;
     }
 

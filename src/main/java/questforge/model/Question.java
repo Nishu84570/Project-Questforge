@@ -25,8 +25,7 @@ public class Question {
     @Column(name = "question_text", nullable = false, length = 2000)
     private String questionText;
 
-    public Question() {
-    }
+    public Question() {}
 
     public Long getId() {
         return id;
@@ -46,5 +45,9 @@ public class Question {
 
     public void setQuestionText(String questionText) {
         this.questionText = questionText;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

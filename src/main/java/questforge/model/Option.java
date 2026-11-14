@@ -59,4 +59,8 @@ public class Option {
     public void setIsCorrect(Boolean correct) {
         isCorrect = correct;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

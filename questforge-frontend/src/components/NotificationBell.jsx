@@ -8,34 +8,48 @@ function NotificationBell() {
 
   const loadUnreadCount = useCallback(async () => {
     try {
-      const { response, data } = await apiRequest('/notifications/unread/count', {
-        method: 'GET',
-      });
+      const { response, data } = await apiRequest(
+        '/notifications/unread/count',
+        { method: 'GET' }
+      );
 
       if (!response.ok) return;
 
-      const count =
+      const rawCount =
         typeof data === 'number'
           ? data
-          : Number(data?.count ?? data?.unreadCount ?? 0);
+          : data?.count ?? data?.unreadCount ?? 0;
 
-      setUnreadCount(Number.isFinite(count) && count > 0 ? count : 0);
+      const count = Number(rawCount);
+
+      setUnreadCount(
+        Number.isFinite(count) && count > 0 ? Math.floor(count) : 0
+      );
     } catch (error) {
-      console.error('Notification count error:', error);
+      console.error('Unable to load notification count:', error);
     }
   }, []);
 
   useEffect(() => {
     loadUnreadCount();
 
-    const handleNotificationChange = () => loadUnreadCount();
-    window.addEventListener('questforge-notification-change', handleNotificationChange);
+    const handleNotificationChange = () => {
+      loadUnreadCount();
+    };
 
-    const interval = setInterval(loadUnreadCount, 30000);
+    window.addEventListener(
+      'questforge-notification-change',
+      handleNotificationChange
+    );
+
+    const intervalId = window.setInterval(loadUnreadCount, 30000);
 
     return () => {
-      window.removeEventListener('questforge-notification-change', handleNotificationChange);
-      clearInterval(interval);
+      window.removeEventListener(
+        'questforge-notification-change',
+        handleNotificationChange
+      );
+      window.clearInterval(intervalId);
     };
   }, [loadUnreadCount]);
 
@@ -44,16 +58,23 @@ function NotificationBell() {
       to="/notifications"
       className="notification-bell"
       aria-label={
-        unreadCount > 0 ? `${unreadCount} unread notifications` : 'Notifications'
+        unreadCount > 0
+          ? `${unreadCount} unread notifications`
+          : 'Notifications'
       }
       title="Notifications"
     >
-      <span className="bell-icon" aria-hidden="true">🔔</span>
+      <span className="bell-icon" aria-hidden="true">
+        🔔
+      </span>
+
       {unreadCount > 0 && (
-        <span className="notification-badge">
+        <span className="notification-badge" aria-live="polite">
           {unreadCount > 99 ? '99+' : unreadCount}
         </span>
       )}
+
+      <span className="bell-ripple" aria-hidden="true" />
     </Link>
   );
 }

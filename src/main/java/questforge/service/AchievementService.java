@@ -30,8 +30,7 @@ public class AchievementService {
     }
 
     @Transactional(readOnly = true)
-    public List<AchievementResponseDTO> getUserAchievements(
-            String email) {
+    public List<AchievementResponseDTO> getUserAchievements(String email) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->

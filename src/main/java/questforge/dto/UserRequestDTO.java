@@ -17,10 +17,8 @@ public class UserRequestDTO {
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
+    @Size(min = 8,max = 50, message = "Password must be between 8 and 50 characters")
     private String password;
-
-    private String role;
 
     public UserRequestDTO() {
     }
@@ -47,13 +45,5 @@ public class UserRequestDTO {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 }

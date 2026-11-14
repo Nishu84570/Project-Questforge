@@ -71,4 +71,8 @@ public class Challenge {
     public void setCategory(String category) {
         this.category = category;
     }
+
+    public void setId(Long id) {
+    this.id = id;
+    }
 }

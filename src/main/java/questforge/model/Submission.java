@@ -40,15 +40,15 @@ public class Submission {
 
     @PositiveOrZero(message = "Total questions cannot be negative")
     @Column(name = "total_questions", nullable = false)
-    private long totalQuestions = 0L;
+    private Long totalQuestions = 0L;
 
     @PositiveOrZero(message = "Correct answers cannot be negative")
     @Column(name = "correct_answers", nullable = false)
-    private long correctAnswers = 0L;
+    private Long correctAnswers = 0L;
 
     @PositiveOrZero(message = "Score cannot be negative")
     @Column(nullable = false)
-    private long score = 0L;
+    private Long score = 0L;
 
     @NotNull(message = "First submission status is required")
     @Column(name = "first_submission", nullable = false)

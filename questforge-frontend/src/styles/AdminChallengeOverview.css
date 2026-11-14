@@ -1,183 +1,1077 @@
-/* Page Wrapper */
-.page.admin-page.admin-challenge-overview-page {
-  padding: 32px 5%;
-  max-width: 1400px;
-  margin: 0 auto;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  color: #f3f4f6;
+
+/* =========================================================
+   QUESTFORGE - ADMIN CHALLENGE OVERVIEW
+   Premium Admin Dashboard UI
+   Responsive | Modern | Professional
+========================================================= */
+
+.admin-challenge-overview-page {
+  --aco-bg: #080d19;
+  --aco-card: #111a2b;
+  --aco-card-hover: #162238;
+  --aco-border: rgba(148, 163, 184, 0.14);
+  --aco-text: #f1f5f9;
+  --aco-muted: #94a3b8;
+  --aco-primary: #8b5cf6;
+  --aco-primary-light: #a78bfa;
+  --aco-blue: #38bdf8;
+  --aco-green: #34d399;
+  --aco-orange: #fb923c;
+  --aco-red: #fb7185;
+
+  color: var(--aco-text);
+  padding-bottom: 35px;
+  animation: aco-page-enter 0.45s ease both;
 }
 
-/* Header Action Buttons */
-.header-actions {
+@keyframes aco-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.aco-header {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 25px;
+  margin-bottom: 30px;
 }
 
-/* Filters Card */
-.filter-card {
-  background: rgba(20, 20, 30, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 20px;
-  margin-bottom: 28px;
-  backdrop-filter: blur(12px);
+.aco-header-content {
+  min-width: 0;
 }
 
-.filter-controls-wrapper {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
+.aco-breadcrumb {
+  display: inline-flex;
   align-items: center;
+  gap: 9px;
+  color: var(--aco-primary-light);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 13px;
 }
 
-.admin-search-input {
-  flex: 1;
-  min-width: 240px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f3f4f6;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  outline: none;
-  transition: all 0.25s ease;
+.aco-breadcrumb-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--aco-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.8);
 }
 
-.admin-search-input:focus {
-  border-color: rgba(99, 102, 241, 0.6);
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
-}
-
-.admin-select {
-  min-width: 180px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #f3f4f6;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.25s ease;
-}
-
-.admin-select:hover,
-.admin-select:focus {
-  border-color: rgba(99, 102, 241, 0.6);
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.admin-select option {
-  background: #12121a;
-  color: #f3f4f6;
-}
-
-/* Table Card Container */
-.admin-table-card {
-  background: linear-gradient(145deg, rgba(20, 20, 30, 0.85), rgba(12, 12, 18, 0.95));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(14px);
-}
-
-.section-heading {
-  margin-bottom: 20px;
-}
-
-.section-heading .eyebrow {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #818cf8;
-  margin: 0 0 4px 0;
-  display: block;
-}
-
-.section-heading h2 {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #ffffff;
+.aco-header h1 {
+  font-size: clamp(27px, 4vw, 36px);
+  line-height: 1.2;
+  font-weight: 850;
+  letter-spacing: -1.2px;
   margin: 0;
+  color: #f8fafc;
 }
 
-/* Responsive Table Wrapper */
-.table-responsive-wrapper {
-  overflow-x: auto;
+.aco-header-content > p {
+  color: var(--aco-muted);
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 10px 0 0;
+  max-width: 600px;
 }
 
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-  font-size: 0.9rem;
+.aco-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex-shrink: 0;
 }
 
-.admin-table th {
-  color: #9ca3af;
-  font-weight: 600;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.aco-button {
+  min-height: 43px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 17px;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.admin-table td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: #e5e7eb;
-  vertical-align: middle;
+.aco-button:hover:not(:disabled) {
+  transform: translateY(-2px);
 }
 
-.admin-table tbody tr {
+.aco-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.aco-button-secondary {
+  background: rgba(30, 41, 59, 0.7);
+  color: #cbd5e1;
+  border-color: var(--aco-border);
+}
+
+.aco-button-secondary:hover {
+  background: #26344c;
+  color: white;
+  border-color: rgba(148, 163, 184, 0.3);
+}
+
+.aco-button-primary {
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  box-shadow: 0 5px 18px rgba(124, 58, 237, 0.22);
+}
+
+.aco-button-primary:hover:not(:disabled) {
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35);
+}
+
+.aco-refresh-spinning {
+  display: inline-block;
+  animation: aco-spin 1s linear infinite;
+}
+
+@keyframes aco-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   ERROR BANNER
+========================================================= */
+
+.aco-error-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 17px 19px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(251, 113, 133, 0.28);
+  border-radius: 13px;
+  background: rgba(127, 29, 29, 0.13);
+}
+
+.aco-error-content {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.aco-error-icon {
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: #fecdd3;
+  background: rgba(251, 113, 133, 0.16);
+  font-weight: 900;
+}
+
+.aco-error-content strong {
+  display: block;
+  color: #fda4af;
+  font-size: 13px;
+}
+
+.aco-error-content p {
+  margin: 5px 0 0;
+  color: #cbd5e1;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.aco-error-retry {
+  padding: 8px 15px;
+  color: #fecdd3;
+  background: rgba(251, 113, 133, 0.12);
+  border: 1px solid rgba(251, 113, 133, 0.3);
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* =========================================================
+   STATISTICS GRID
+========================================================= */
+
+.aco-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 17px;
+  margin-bottom: 25px;
+}
+
+.aco-stat-card {
+  position: relative;
+  min-width: 0;
+  padding: 21px;
+  overflow: hidden;
+  border-radius: 15px;
+  border: 1px solid var(--aco-border);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(30, 41, 59, 0.45),
+      rgba(15, 23, 42, 0.96)
+    );
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.aco-stat-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(167, 139, 250, 0.35);
+  background: var(--aco-card-hover);
+}
+
+.aco-stat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 19px;
+}
+
+.aco-stat-label {
+  color: var(--aco-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.aco-stat-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.aco-icon-purple {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.16);
+}
+
+.aco-icon-blue {
+  color: #7dd3fc;
+  background: rgba(56, 189, 248, 0.14);
+}
+
+.aco-icon-green {
+  color: #6ee7b7;
+  background: rgba(52, 211, 153, 0.13);
+}
+
+.aco-icon-orange {
+  color: #fdba74;
+  background: rgba(251, 146, 60, 0.14);
+}
+
+.aco-stat-value {
+  display: block;
+  color: #f8fafc;
+  font-size: clamp(25px, 3vw, 31px);
+  line-height: 1.2;
+  font-weight: 850;
+  letter-spacing: -0.8px;
+  overflow-wrap: anywhere;
+}
+
+.aco-stat-description {
+  display: block;
+  margin-top: 9px;
+  color: #77869c;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   FILTER PANEL
+========================================================= */
+
+.aco-filter-panel {
+  padding: 23px;
+  margin-bottom: 24px;
+  border: 1px solid var(--aco-border);
+  border-radius: 15px;
+  background: var(--aco-card);
+}
+
+.aco-filter-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 21px;
+}
+
+.aco-section-eyebrow {
+  display: block;
+  color: var(--aco-primary-light);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 1.7px;
+  margin-bottom: 8px;
+}
+
+.aco-filter-heading h2,
+.aco-table-header h2 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.35px;
+}
+
+.aco-filter-heading p,
+.aco-table-header p {
+  margin: 7px 0 0;
+  color: var(--aco-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.aco-clear-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid rgba(251, 113, 133, 0.22);
+  border-radius: 8px;
+  background: rgba(251, 113, 133, 0.08);
+  color: #fda4af;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
   transition: background 0.2s ease;
 }
 
-.admin-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
+.aco-clear-button:hover {
+  background: rgba(251, 113, 133, 0.16);
 }
 
-.table-subtext {
-  color: #9ca3af;
-  font-size: 0.78rem;
+.aco-clear-button span {
+  font-size: 17px;
 }
 
-/* Difficulty Tags in Table */
-.table-difficulty {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
+.aco-filter-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 190px 190px;
+  gap: 12px;
 }
 
-.table-difficulty.easy {
-  background: rgba(16, 185, 129, 0.12);
-  color: #34d399;
-  border: 1px solid rgba(52, 211, 153, 0.25);
+.aco-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
-.table-difficulty.medium {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.25);
+.aco-search-icon {
+  position: absolute;
+  left: 15px;
+  color: #8493a9;
+  font-size: 23px;
+  pointer-events: none;
 }
 
-.table-difficulty.hard {
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(248, 113, 113, 0.25);
+.aco-search-input,
+.aco-select {
+  width: 100%;
+  height: 45px;
+  padding: 0 14px;
+  outline: none;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 10px;
+  background: #0b1322;
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 12px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
-.analytics-btn {
-  padding: 6px 12px;
-  font-size: 0.8rem;
+.aco-search-input {
+  padding-left: 43px;
+  padding-right: 40px;
+}
+
+.aco-search-input::placeholder {
+  color: #64748b;
+}
+
+.aco-search-input:focus,
+.aco-select:focus {
+  border-color: var(--aco-primary);
+  background: #101a2c;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+.aco-search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.aco-select {
+  cursor: pointer;
+}
+
+.aco-select option {
+  background: #111a2b;
+  color: white;
+}
+
+.aco-search-clear {
+  position: absolute;
+  right: 11px;
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.12);
+  color: #cbd5e1;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.aco-filter-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--aco-border);
+  color: var(--aco-muted);
+  font-size: 11px;
+}
+
+.aco-filter-footer strong {
+  color: #e2e8f0;
+}
+
+.aco-filter-active {
+  color: #c4b5fd;
+  font-weight: 750;
+}
+
+/* =========================================================
+   TABLE CARD
+========================================================= */
+
+.aco-table-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--aco-border);
+  border-radius: 15px;
+  background: var(--aco-card);
+}
+
+.aco-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 24px;
+  border-bottom: 1px solid var(--aco-border);
+}
+
+.aco-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  border-radius: 30px;
+  background: rgba(52, 211, 153, 0.07);
+  color: #6ee7b7;
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.aco-live-indicator span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--aco-green);
+  box-shadow: 0 0 9px rgba(52, 211, 153, 0.7);
+}
+
+/* =========================================================
+   RESPONSIVE TABLE
+========================================================= */
+
+.aco-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #111a2b;
+}
+
+.aco-table-responsive::-webkit-scrollbar {
+  height: 7px;
+}
+
+.aco-table-responsive::-webkit-scrollbar-track {
+  background: #111a2b;
+}
+
+.aco-table-responsive::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 10px;
+}
+
+.aco-table {
+  width: 100%;
+  min-width: 1080px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.aco-table thead {
+  background: rgba(30, 41, 59, 0.45);
+}
+
+.aco-table th {
+  padding: 16px 15px;
+  color: #8493a9;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--aco-border);
+}
+
+.aco-table th:first-child,
+.aco-table td:first-child {
+  padding-left: 24px;
+}
+
+.aco-table th:last-child,
+.aco-table td:last-child {
+  padding-right: 24px;
+}
+
+.aco-table td {
+  padding: 17px 15px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.09);
+  color: #cbd5e1;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.aco-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.aco-table tbody tr:hover {
+  background: rgba(139, 92, 246, 0.055);
+}
+
+.aco-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* =========================================================
+   CHALLENGE CELL
+========================================================= */
+
+.aco-challenge-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 185px;
+}
+
+.aco-challenge-avatar {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  flex-shrink: 0;
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.25),
+    rgba(99, 102, 241, 0.1)
+  );
+  color: #c4b5fd;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.aco-challenge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.aco-challenge-info strong {
+  max-width: 220px;
+  overflow: hidden;
+  color: #f1f5f9;
+  font-size: 12px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+}
+
+.aco-challenge-info span {
+  color: #74839a;
+  font-size: 10px;
+}
+
+/* =========================================================
+   DIFFICULTY BADGES
+========================================================= */
+
+.aco-difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.aco-difficulty-badge.easy {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.19);
+}
+
+.aco-difficulty-badge.medium {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.aco-difficulty-badge.hard {
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.1);
+  border-color: rgba(244, 63, 94, 0.2);
+}
+
+.aco-difficulty-badge.unknown {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+/* =========================================================
+   TABLE METRICS
+========================================================= */
+
+.aco-category-text {
+  color: #c4b5fd;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.aco-metric-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.aco-metric-cell strong,
+.aco-table-number {
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.aco-metric-cell span {
+  color: #74839a;
+  font-size: 10px;
+}
+
+/* =========================================================
+   COMPLETION PROGRESS
+========================================================= */
+
+.aco-completion-cell {
+  width: 110px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.aco-completion-info strong {
+  color: #6ee7b7;
+  font-size: 11px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.aco-progress-track {
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(148, 163, 184, 0.16);
+}
+
+.aco-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #10b981, #6ee7b7);
+  transition: width 0.4s ease;
+}
+
+/* =========================================================
+   ANALYTICS BUTTON
+========================================================= */
+
+.aco-analytics-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.1);
+  color: #c4b5fd;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 800;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.aco-analytics-button:hover {
+  transform: translateY(-2px);
+  background: rgba(139, 92, 246, 0.22);
+  border-color: rgba(167, 139, 250, 0.55);
+  color: #e9d5ff;
+}
+
+.aco-analytics-button span {
+  font-size: 15px;
+}
+
+.aco-unavailable {
+  color: #64748b;
+  font-size: 10px;
+}
+
+/* =========================================================
+   EMPTY & LOADING STATES
+========================================================= */
+
+.aco-state-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 285px;
+  padding: 35px 20px;
+  text-align: center;
+}
+
+.aco-spinner {
+  width: 39px;
+  height: 39px;
+  margin-bottom: 19px;
+  border: 3px solid rgba(148, 163, 184, 0.15);
+  border-top-color: var(--aco-primary-light);
+  border-radius: 50%;
+  animation: aco-spin 0.8s linear infinite;
+}
+
+.aco-state-container h3 {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.aco-state-container p {
+  margin: 9px 0 17px;
+  color: var(--aco-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.aco-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin-bottom: 17px;
+  border-radius: 16px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #c4b5fd;
+  font-size: 32px;
+}
+
+/* =========================================================
+   TABLE FOOTER
+========================================================= */
+
+.aco-table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 24px;
+  border-top: 1px solid var(--aco-border);
+  background: rgba(15, 23, 42, 0.5);
+  color: #8493a9;
+  font-size: 10px;
+}
+
+.aco-table-footer strong {
+  color: #e2e8f0;
+}
+
+.aco-footer-status {
+  color: #a78bfa;
+  font-weight: 750;
+}
+
+/* =========================================================
+   PAGE FOOTER
+========================================================= */
+
+.aco-page-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-top: 22px;
+  padding: 13px 2px;
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.8px;
+}
+
+.aco-page-footer span:last-child {
+  color: #8493a9;
+  letter-spacing: 0.2px;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+.admin-challenge-overview-page button:focus-visible,
+.admin-challenge-overview-page a:focus-visible,
+.admin-challenge-overview-page input:focus-visible,
+.admin-challenge-overview-page select:focus-visible {
+  outline: 2px solid var(--aco-primary-light);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   TABLET RESPONSIVENESS
+========================================================= */
+
+@media (max-width: 1100px) {
+  .aco-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .aco-filter-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aco-search-wrapper {
+    grid-column: 1 / -1;
+  }
+}
+
+/* =========================================================
+   MOBILE RESPONSIVENESS
+========================================================= */
+
+@media (max-width: 700px) {
+  .aco-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 19px;
+  }
+
+  .aco-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .aco-header-actions .aco-button {
+    flex: 1;
+  }
+
+  .aco-header h1 {
+    font-size: 28px;
+  }
+
+  .aco-stats-grid {
+    gap: 11px;
+  }
+
+  .aco-stat-card {
+    padding: 15px;
+  }
+
+  .aco-stat-label {
+    font-size: 11px;
+  }
+
+  .aco-stat-description {
+    font-size: 10px;
+  }
+
+  .aco-stat-icon {
+    width: 31px;
+    height: 31px;
+  }
+
+  .aco-filter-panel {
+    padding: 17px;
+  }
+
+  .aco-filter-heading {
+    align-items: flex-start;
+  }
+
+  .aco-filter-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .aco-search-wrapper {
+    grid-column: auto;
+  }
+
+  .aco-table-header {
+    padding: 19px;
+    align-items: flex-start;
+  }
+
+  .aco-live-indicator {
+    font-size: 9px;
+    padding: 7px 9px;
+  }
+
+  .aco-table-footer {
+    padding: 14px 17px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+  .aco-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aco-stat-card {
+    padding: 12px;
+  }
+
+  .aco-stat-value {
+    font-size: 23px;
+  }
+
+  .aco-stat-top {
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .aco-stat-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+
+  .aco-header-actions {
+    flex-direction: column;
+  }
+
+  .aco-header-actions .aco-button {
+    width: 100%;
+    flex: auto;
+  }
+
+  .aco-filter-heading {
+    flex-direction: column;
+  }
+
+  .aco-table-header {
+    flex-direction: column;
+  }
+
+  .aco-table-footer,
+  .aco-page-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .aco-error-banner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-challenge-overview-page,
+  .admin-challenge-overview-page *,
+  .admin-challenge-overview-page *::before,
+  .admin-challenge-overview-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

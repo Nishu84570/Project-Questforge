@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import questforge.model.User;
+import questforge.model.User.Role;
 import questforge.repository.UserRepository;
 
 @Service
@@ -26,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Invalid email or password"));
 
-        String role = user.getRole();
+        Role role = user.getRole();
 
         if (role == null
                 || !role.matches("(?i)USER|EMPLOYEE|ADMIN")) {

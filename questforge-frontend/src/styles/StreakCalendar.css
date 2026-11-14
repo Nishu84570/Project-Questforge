@@ -1,167 +1,1553 @@
-.streak-calendar-page {
-  padding: 2rem 1rem;
-  display: flex;
-  justify-content: center;
-  background-color: #0b0e14;
-  min-height: 85vh;
-  color: #ffffff;
-}
 
-.streak-calendar-container {
+/* =====================================================
+   QUESTFORGE - PREMIUM COMPACT STREAK CALENDAR
+   ===================================================== */
+
+.sc-container {
+  --sc-bg: #0b1020;
+  --sc-card: #121a2d;
+  --sc-card-light: #19243a;
+  --sc-border: rgba(148, 163, 184, 0.13);
+  --sc-text: #f1f5f9;
+  --sc-muted: #94a3b8;
+  --sc-purple: #8b5cf6;
+  --sc-cyan: #22d3ee;
+
   width: 100%;
-  max-width: 800px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 19px;
+
+  color: var(--sc-text);
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(124, 58, 237, 0.09),
+      transparent 35%
+    ),
+    var(--sc-bg);
+
+  border: 1px solid var(--sc-border);
+  border-radius: 17px;
+
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.24);
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
-.streak-calendar-container h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: #f3f4f6;
-  border-bottom: 2px solid #1f2430;
-  padding-bottom: 0.75rem;
+.sc-container *,
+.sc-container *::before,
+.sc-container *::after {
+  box-sizing: border-box;
 }
 
-.streak-stats-row {
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.sc-main-header {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 175px;
+  padding: 25px 75px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(109, 40, 217, 0.18),
+      rgba(15, 23, 42, 0.95) 55%,
+      rgba(8, 145, 178, 0.13)
+    );
+
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 15px;
+
+  animation: scAppear 0.5s ease both;
+}
+
+.sc-header-content {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sc-header-icon {
+  width: 43px;
+  height: 43px;
+
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  place-items: center;
+
+  margin-bottom: 9px;
+
+  background: rgba(139, 92, 246, 0.13);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: 12px;
+
+  font-size: 1.35rem;
 }
 
-.stat-card {
-  background-color: #121824;
-  border: 1px solid #1f2937;
-  padding: 1.25rem;
-  border-radius: 12px;
+.sc-eyebrow {
+  display: block;
+  margin-bottom: 6px;
+
+  color: #a78bfa;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.sc-header-content h1 {
+  margin: 0;
+
+  color: #fff;
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  font-weight: 850;
+  letter-spacing: -0.7px;
+}
+
+.sc-header-content p {
+  margin: 7px 0 0;
+  color: #a5b4fc;
+  font-size: 0.82rem;
+}
+
+.sc-header-line {
+  width: 90px;
+  height: 2px;
+  margin-top: 13px;
+
+  overflow: hidden;
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 10px;
+}
+
+.sc-header-line span {
+  display: block;
+  width: 45%;
+  height: 100%;
+  margin: auto;
+
+  background: linear-gradient(90deg, #8b5cf6, #22d3ee);
+  animation: scLine 2.5s ease-in-out infinite alternate;
+}
+
+.sc-header-decoration {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(45px);
+  pointer-events: none;
+}
+
+.sc-decoration-one {
+  top: -90px;
+  left: -50px;
+  width: 190px;
+  height: 190px;
+  background: rgba(139, 92, 246, 0.17);
+}
+
+.sc-decoration-two {
+  right: -60px;
+  bottom: -100px;
+  width: 210px;
+  height: 210px;
+  background: rgba(34, 211, 238, 0.11);
+}
+
+/* REFRESH */
+
+.sc-refresh {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  z-index: 3;
+
   display: flex;
   align-items: center;
-  gap: 1rem;
-}
+  gap: 7px;
 
-.stat-icon {
-  font-size: 2rem;
-  background: #1e293b;
-  padding: 0.5rem;
+  padding: 8px 12px;
+
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.10);
+  border: 1px solid rgba(139, 92, 246, 0.25);
   border-radius: 8px;
-}
 
-.stat-title {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  margin: 0;
-}
-
-.stat-value {
-  font-size: 1.4rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #f9fafb;
-  margin: 0;
+  cursor: pointer;
+
+  transition: 0.2s ease;
 }
 
-.calendar-card {
-  background-color: #121824;
-  border: 1px solid #1f2937;
-  padding: 1.5rem;
-  border-radius: 12px;
+.sc-refresh:hover {
+  background: rgba(139, 92, 246, 0.22);
+  transform: translateY(-2px);
 }
 
-.calendar-card h3 {
-  margin-bottom: 0.25rem;
-  font-size: 1.2rem;
-  color: #e5e7eb;
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+
+@keyframes scAppear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.calendar-subtitle {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  margin-bottom: 1rem;
+@keyframes scLine {
+  from { transform: translateX(-20px); }
+  to { transform: translateX(20px); }
 }
 
-.calendar-grid {
+@keyframes scFlame {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@keyframes scTodayPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.15);
+  }
+}
+
+/* =====================================================
+   WARNING
+   ===================================================== */
+
+.sc-warning {
+  padding: 11px 14px;
+
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.19);
+  border-radius: 9px;
+
+  font-size: 0.8rem;
+}
+
+/* =====================================================
+   STREAK HERO
+   ===================================================== */
+
+.sc-hero {
+  position: relative;
+  overflow: hidden;
+
+  padding: 21px;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(124, 58, 237, 0.17),
+      rgba(30, 41, 59, 0.65),
+      rgba(14, 116, 144, 0.12)
+    ),
+    #151b30;
+
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  border-radius: 15px;
+}
+
+.sc-hero-glow {
+  position: absolute;
+  top: -100px;
+  right: -70px;
+
+  width: 220px;
+  height: 220px;
+
+  background: rgba(139, 92, 246, 0.13);
+  border-radius: 50%;
+  filter: blur(55px);
+  pointer-events: none;
+}
+
+.sc-hero-content {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 17px;
+}
+
+.sc-hero-flame {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+  place-items: center;
+
+  width: 73px;
+  height: 73px;
+  flex-shrink: 0;
+
+  background: rgba(249, 115, 22, 0.11);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 18px;
+
+  font-size: 2.6rem;
+  animation: scFlame 2.5s ease-in-out infinite;
+}
+
+.sc-hero-label {
+  color: #c4b5fd;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.sc-hero-number {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+
+  margin-top: 4px;
+
+  color: #fff;
+  font-size: clamp(2.3rem, 5vw, 3.3rem);
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.sc-hero-number span {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.sc-hero-content p {
+  margin: 7px 0 0;
+  color: #a5b4fc;
+  font-size: 0.78rem;
+}
+
+/* STATS */
+
+.sc-hero-bottom {
+  position: relative;
+  z-index: 1;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  margin-top: 18px;
+  padding-top: 15px;
+
+  border-top: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.sc-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  padding: 11px;
+
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+}
+
+.sc-stat-icon {
+  display: grid;
+  place-items: center;
+
+  width: 37px;
+  height: 37px;
+  flex-shrink: 0;
+
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 9px;
+  font-size: 1.15rem;
+}
+
+.sc-stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sc-stat-info > span {
+  color: var(--sc-muted);
+  font-size: 0.68rem;
+}
+
+.sc-stat-info strong {
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+.sc-stat-info small {
+  color: #64748b;
+  font-size: 0.65rem;
+}
+
+/* =====================================================
+   CALENDAR SECTION
+   ===================================================== */
+
+.sc-calendar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.sc-calendar-title-box {
+  position: relative;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 18px;
+
+  text-align: center;
+
+  background: linear-gradient(
+    110deg,
+    rgba(109, 40, 217, 0.13),
+    rgba(15, 23, 42, 0.95),
+    rgba(8, 145, 178, 0.09)
+  );
+
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 13px;
+}
+
+.sc-title-decoration {
+  position: absolute;
+  top: -80px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: rgba(34, 211, 238, 0.08);
+  border-radius: 50%;
+  filter: blur(45px);
+}
+
+.sc-calendar-title-box .sc-eyebrow {
+  position: relative;
+  margin-bottom: 7px;
+}
+
+.sc-calendar-title-icon {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  width: 39px;
+  height: 39px;
+
+  margin-bottom: 8px;
+
+  background: rgba(99, 102, 241, 0.14);
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  border-radius: 11px;
+
+  font-size: 1.2rem;
+}
+
+.sc-calendar-title-box h2 {
+  position: relative;
+  margin: 0;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 850;
+}
+
+.sc-calendar-title-box p {
+  position: relative;
+  margin: 6px 0 0;
+  color: #a5b4fc;
+  font-size: 0.77rem;
+}
+
+.sc-title-underline {
+  width: 80px;
+  height: 2px;
+  margin-top: 11px;
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 10px;
+}
+
+.sc-title-underline span {
+  display: block;
+  width: 45%;
+  height: 100%;
+  margin: auto;
+  background: linear-gradient(90deg, #8b5cf6, #22d3ee);
+}
+
+/* =====================================================
+   CALENDAR CARD
+   ===================================================== */
+
+.sc-calendar-card {
+  padding: 19px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.72),
+    rgba(15, 23, 42, 0.96)
+  );
+
+  border: 1px solid var(--sc-border);
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* TOOLBAR */
+
+.sc-calendar-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.sc-month-information {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sc-month-icon {
+  display: grid;
+  place-items: center;
+
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.19);
+  border-radius: 10px;
+
+  font-size: 1.15rem;
+}
+
+.sc-toolbar-label {
+  display: block;
+  margin-bottom: 3px;
+  color: #a78bfa;
+  font-size: 0.61rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.sc-month-information h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.sc-calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.sc-nav-button {
+  display: grid;
+  place-items: center;
+
+  width: 34px;
+  height: 34px;
+
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.11);
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  border-radius: 8px;
+
+  font-size: 1.35rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.sc-nav-button:hover {
+  color: #fff;
+  background: rgba(139, 92, 246, 0.27);
+}
+
+.sc-today-button {
+  padding: 9px 12px;
+
+  color: #67e8f9;
+  background: rgba(34, 211, 238, 0.07);
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  border-radius: 8px;
+
+  font-size: 0.73rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.sc-today-button:hover {
+  background: rgba(34, 211, 238, 0.16);
+}
+
+/* =====================================================
+   DATE PICKER
+   ===================================================== */
+
+.sc-date-jump {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  margin: 17px 0;
+  padding: 11px 13px;
+
+  background: rgba(139, 92, 246, 0.055);
+  border: 1px solid rgba(139, 92, 246, 0.15);
+  border-radius: 10px;
+}
+
+.sc-date-jump-info {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.sc-date-jump-icon {
+  display: grid;
+  place-items: center;
+
+  width: 33px;
+  height: 33px;
+  flex-shrink: 0;
+
+  background: rgba(139, 92, 246, 0.12);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.sc-date-jump-info div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sc-date-jump-info strong {
+  color: #e2e8f0;
+  font-size: 0.79rem;
+}
+
+.sc-date-jump-info small {
+  color: var(--sc-muted);
+  font-size: 0.66rem;
+}
+
+.sc-month-input {
+  width: 165px;
+  max-width: 100%;
+  min-width: 0;
+
+  padding: 8px 10px;
+
+  color: #e2e8f0;
+  color-scheme: dark;
+  background: #1e293b;
+
+  border: 1px solid rgba(139, 92, 246, 0.26);
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 0.77rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.sc-month-input:focus {
+  border-color: #8b5cf6;
+}
+
+/* =====================================================
+   CALENDAR GRID
+   ===================================================== */
+
+.sc-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 8px;
 }
 
-.calendar-day {
-  height: 45px;
-  border-radius: 8px;
+.sc-weekday {
+  display: grid;
+  place-items: center;
+
+  padding: 7px 0;
+
+  color: #818cf8;
+  font-size: 0.73rem;
+  font-weight: 850;
+}
+
+.sc-calendar-empty {
+  aspect-ratio: 1;
+}
+
+/* DAY */
+
+.sc-day {
+  position: relative;
+
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border: 1px solid #2d3748;
-  transition: transform 0.2s;
+  gap: 2px;
+
+  min-width: 0;
+  aspect-ratio: 1;
+
+  color: #cbd5e1;
+  background: #1e293b;
+
+  border: 1px solid rgba(148, 163, 184, 0.11);
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 750;
+
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 
-.calendar-day:hover {
-  transform: scale(1.05);
+.sc-day:hover {
+  color: #fff;
+  background: #29374d;
+  border-color: #8b5cf6;
+  transform: translateY(-2px);
 }
 
-.active-streak {
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
-  color: white;
-  border-color: #f87171;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+/* ACTIVE */
+
+.sc-day-active {
+  color: #fff;
+  background: linear-gradient(145deg, #f59e0b, #ea580c);
+  border-color: rgba(251, 146, 60, 0.6);
 }
 
-.inactive-streak {
-  background-color: #1a202c;
-  color: #718096;
+.sc-day-active:hover {
+  background: linear-gradient(145deg, #fbbf24, #f97316);
 }
 
-.quests-row {
+/* FUTURE */
+
+.sc-day-future {
+  color: #475569;
+  background: rgba(15, 23, 42, 0.65);
+  border-style: dashed;
+}
+
+/* TODAY */
+
+.sc-day-today {
+  color: #fff;
+  background: linear-gradient(145deg, #0e7490, #2563eb) !important;
+  border: 2px solid #67e8f9 !important;
+  animation: scTodayPulse 2.5s ease-in-out infinite;
+}
+
+.sc-today-indicator {
+  color: #cffafe;
+  font-size: 0.43rem;
+  font-weight: 900;
+}
+
+.sc-day-selected:not(.sc-day-today) {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 2px;
+  border-color: #c4b5fd;
+}
+
+.sc-day-active .sc-active-indicator {
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+/* =====================================================
+   SELECTED DATE
+   ===================================================== */
+
+.sc-selected-date {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+
+  margin-top: 16px;
+  padding: 12px;
+
+  background: rgba(139, 92, 246, 0.065);
+  border: 1px solid rgba(139, 92, 246, 0.19);
+  border-radius: 10px;
+
+  animation: scAppear 0.25s ease both;
+}
+
+.sc-selected-date-icon {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
+  place-items: center;
+
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+
+  background: rgba(139, 92, 246, 0.12);
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
-.quest-box {
-  background-color: #121824;
-  border: 1px solid #1f2937;
-  padding: 1.25rem;
+.sc-selected-date-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sc-selected-date-info > span {
+  color: #a78bfa;
+  font-size: 0.61rem;
+  font-weight: 850;
+  letter-spacing: 1px;
+}
+
+.sc-selected-date-info strong {
+  color: #f1f5f9;
+  font-size: 0.84rem;
+}
+
+.sc-selected-date-info p {
+  margin: 0;
+  color: var(--sc-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+/* =====================================================
+   LEGEND
+   ===================================================== */
+
+.sc-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+
+  margin-top: 17px;
+  padding-top: 14px;
+
+  border-top: 1px solid var(--sc-border);
+}
+
+.sc-calendar-legend > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #94a3b8;
+  font-size: 0.68rem;
+}
+
+.sc-legend-dot {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+.sc-legend-today { background: #22d3ee; }
+.sc-legend-active { background: #f97316; }
+.sc-legend-normal { background: #334155; }
+
+.sc-calendar-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+
+  margin-top: 12px;
+  padding: 10px;
+
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.025);
+  border-radius: 8px;
+
+  font-size: 0.69rem;
+  line-height: 1.5;
+}
+
+/* =====================================================
+   QUESTS
+   ===================================================== */
+
+.sc-quests-section {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.sc-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.sc-section-heading h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 850;
+}
+
+.sc-quest-count {
+  padding: 6px 9px;
+
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.09);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: 7px;
+
+  font-size: 0.63rem;
+  font-weight: 850;
+  letter-spacing: 0.5px;
+}
+
+.sc-quests-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.sc-quest-card {
+  min-width: 0;
+  padding: 17px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(30, 41, 59, 0.7),
+    rgba(15, 23, 42, 0.95)
+  );
+
+  border: 1px solid var(--sc-border);
   border-radius: 12px;
+
+  transition: 0.2s ease;
 }
 
-.quest-box h4 {
-  color: #818cf8;
-  margin-bottom: 0.75rem;
+.sc-quest-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.sc-quest-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sc-quest-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sc-quest-icon {
+  display: grid;
+  place-items: center;
+
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+
+  background: rgba(139, 92, 246, 0.11);
+  border: 1px solid rgba(139, 92, 246, 0.18);
+  border-radius: 9px;
   font-size: 1.1rem;
 }
 
-.quest-box p {
-  margin: 0.3rem 0;
-  font-size: 0.95rem;
-  color: #d1d5db;
+.sc-quest-label {
+  display: block;
+  margin-bottom: 3px;
+
+  color: #a78bfa;
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.8px;
 }
 
-.status-badge {
-  display: inline-block;
-  margin-top: 0.5rem;
-  padding: 0.25rem 0.75rem;
+.sc-quest-heading h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 0.87rem;
+  font-weight: 750;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+/* STATUS */
+
+.sc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+
+  padding: 6px 8px;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+
+  font-size: 0.59rem;
+  font-weight: 750;
 }
 
-.status-badge.completed {
-  background-color: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.4);
+.sc-status > span {
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  border-radius: 50%;
 }
 
-.status-badge.pending {
-  background-color: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.4);
+.sc-status.is-completed {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.09);
+  border: 1px solid rgba(34, 197, 94, 0.17);
 }
 
-.streak-loading, .streak-error {
-  text-align: center;
-  padding: 3rem;
-  color: #9ca3af;
+.sc-status.is-pending {
+  color: #fcd34d;
+  background: rgba(245, 158, 11, 0.09);
+  border: 1px solid rgba(245, 158, 11, 0.17);
+}
+
+/* META */
+
+.sc-quest-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 9px;
+
+  margin: 15px 0;
+  padding: 10px 0;
+
+  border-top: 1px solid var(--sc-border);
+  border-bottom: 1px solid var(--sc-border);
+}
+
+.sc-quest-meta span {
+  color: var(--sc-muted);
+  font-size: 0.69rem;
+}
+
+.sc-quest-meta strong {
+  color: #e2e8f0;
+  font-size: 0.71rem;
+  text-align: right;
+}
+
+/* PROGRESS */
+
+.sc-progress-section {
+  margin-bottom: 15px;
+}
+
+.sc-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.sc-progress-label span {
+  color: #cbd5e1;
+  font-size: 0.73rem;
+}
+
+.sc-progress-label strong {
+  color: #fff;
+  font-size: 0.75rem;
+}
+
+.sc-progress-track {
+  width: 100%;
+  height: 7px;
+  overflow: hidden;
+  background: #283449;
+  border-radius: 20px;
+}
+
+.sc-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #6366f1, #22d3ee);
+  border-radius: inherit;
+  transition: width 0.6s ease;
+}
+
+.sc-progress-fill.is-completed {
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+}
+
+.sc-progress-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 7px;
+
+  color: var(--sc-muted);
+  font-size: 0.65rem;
+}
+
+/* REWARD */
+
+.sc-reward {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 10px;
+
+  background: rgba(245, 158, 11, 0.065);
+  border: 1px solid rgba(245, 158, 11, 0.14);
+  border-radius: 9px;
+}
+
+.sc-reward-icon {
+  display: grid;
+  place-items: center;
+
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+
+  background: rgba(245, 158, 11, 0.12);
+  border-radius: 8px;
   font-size: 1rem;
+}
+
+.sc-reward > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sc-reward small {
+  color: #a1a1aa;
+  font-size: 0.64rem;
+}
+
+.sc-reward strong {
+  color: #fbbf24;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.sc-reward-tag {
+  margin-left: auto;
+  color: #fbbf24;
+  font-size: 0.61rem;
+  font-weight: 850;
+  letter-spacing: 0.4px;
+}
+
+/* EMPTY */
+
+.sc-empty-message {
+  margin: 14px 0 0;
+  padding: 12px;
+
+  color: var(--sc-muted);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px dashed rgba(148, 163, 184, 0.2);
+  border-radius: 9px;
+
+  font-size: 0.77rem;
+  line-height: 1.5;
+}
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+.sc-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+
+  padding: 12px;
+
+  background: rgba(139, 92, 246, 0.05);
+  border: 1px solid rgba(139, 92, 246, 0.11);
+  border-radius: 10px;
+}
+
+.sc-footer span {
+  font-size: 1rem;
+}
+
+.sc-footer p {
+  margin: 0;
+  color: #c4b5fd;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* =====================================================
+   SKELETON
+   ===================================================== */
+
+.sc-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #1e293b;
+  border-radius: 11px;
+}
+
+.sc-skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.07),
+    transparent
+  );
+
+  transform: translateX(-100%);
+  animation: scSkeleton 1.5s infinite;
+}
+
+@keyframes scSkeleton {
+  100% { transform: translateX(100%); }
+}
+
+.sc-skeleton-header { width: 100%; height: 175px; }
+.sc-skeleton-hero { width: 100%; height: 155px; }
+.sc-skeleton-calendar { width: 100%; height: 350px; }
+.sc-skeleton-quests { width: 100%; height: 190px; }
+
+/* =====================================================
+   ACCESSIBILITY
+   ===================================================== */
+
+.sc-container button:focus-visible,
+.sc-container input:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 3px;
+}
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+
+@media (max-width: 768px) {
+  .sc-container {
+    padding: 15px;
+    gap: 16px;
+  }
+
+  .sc-main-header {
+    min-height: 155px;
+    padding: 25px 55px;
+  }
+
+  .sc-quests-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sc-calendar-card {
+    padding: 15px;
+  }
+
+  .sc-calendar-grid {
+    gap: 7px;
+  }
+}
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 480px) {
+  .sc-container {
+    padding: 10px;
+    gap: 13px;
+    border-radius: 12px;
+  }
+
+  .sc-main-header {
+    min-height: 155px;
+    padding: 38px 12px 20px;
+    border-radius: 12px;
+  }
+
+  .sc-header-content h1 {
+    font-size: 1.45rem;
+  }
+
+  .sc-header-content p {
+    max-width: 230px;
+    font-size: 0.7rem;
+    line-height: 1.5;
+  }
+
+  .sc-header-icon {
+    width: 37px;
+    height: 37px;
+    font-size: 1.15rem;
+  }
+
+  .sc-refresh {
+    top: 8px;
+    right: 8px;
+    padding: 6px 9px;
+  }
+
+  .sc-refresh span {
+    display: none;
+  }
+
+  .sc-hero {
+    padding: 14px;
+  }
+
+  .sc-hero-content {
+    gap: 11px;
+  }
+
+  .sc-hero-flame {
+    width: 55px;
+    height: 55px;
+    border-radius: 13px;
+    font-size: 2rem;
+  }
+
+  .sc-hero-number {
+    font-size: 2.15rem;
+  }
+
+  .sc-hero-number span {
+    font-size: 0.75rem;
+  }
+
+  .sc-hero-content p {
+    font-size: 0.66rem;
+    line-height: 1.5;
+  }
+
+  .sc-hero-bottom {
+    gap: 7px;
+    margin-top: 13px;
+    padding-top: 12px;
+  }
+
+  .sc-stat-card {
+    gap: 6px;
+    padding: 8px 6px;
+  }
+
+  .sc-stat-icon {
+    width: 29px;
+    height: 29px;
+    font-size: 0.9rem;
+  }
+
+  .sc-stat-info > span {
+    font-size: 0.59rem;
+  }
+
+  .sc-stat-info strong {
+    font-size: 0.77rem;
+  }
+
+  .sc-stat-info small {
+    font-size: 0.56rem;
+  }
+
+  .sc-calendar-title-box {
+    padding: 16px 10px;
+  }
+
+  .sc-calendar-title-box h2 {
+    font-size: 1.2rem;
+  }
+
+  .sc-calendar-title-box p {
+    font-size: 0.67rem;
+  }
+
+  .sc-calendar-card {
+    padding: 11px;
+  }
+
+  .sc-calendar-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .sc-month-information h3 {
+    font-size: 0.95rem;
+  }
+
+  .sc-calendar-controls {
+    gap: 5px;
+  }
+
+  .sc-nav-button {
+    width: 31px;
+    height: 31px;
+  }
+
+  .sc-today-button {
+    padding: 8px 9px;
+    font-size: 0.67rem;
+  }
+
+  .sc-date-jump {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+    margin: 13px 0;
+    padding: 10px;
+  }
+
+  .sc-month-input {
+    width: 100%;
+    font-size: 0.73rem;
+  }
+
+  .sc-calendar-grid {
+    gap: 4px;
+  }
+
+  .sc-weekday {
+    padding: 6px 0;
+    font-size: 0.62rem;
+  }
+
+  .sc-day {
+    border-radius: 6px;
+    font-size: 0.72rem;
+  }
+
+  .sc-today-indicator {
+    font-size: 0.35rem;
+  }
+
+  .sc-calendar-legend {
+    gap: 9px;
+    margin-top: 13px;
+    padding-top: 11px;
+  }
+
+  .sc-calendar-legend > div {
+    font-size: 0.59rem;
+  }
+
+  .sc-calendar-note {
+    font-size: 0.64rem;
+  }
+
+  .sc-section-heading h2 {
+    font-size: 1.05rem;
+  }
+
+  .sc-quest-card {
+    padding: 13px;
+  }
+
+  .sc-quest-top {
+    flex-wrap: wrap;
+  }
+
+  .sc-quest-heading h3 {
+    font-size: 0.82rem;
+  }
+
+  .sc-reward-tag {
+    display: none;
+  }
+
+  .sc-footer {
+    padding: 10px;
+  }
+
+  .sc-footer p {
+    font-size: 0.66rem;
+  }
+}
+
+/* =====================================================
+   SMALL MOBILE
+   ===================================================== */
+
+@media (max-width: 350px) {
+  .sc-calendar-grid {
+    gap: 3px;
+  }
+
+  .sc-day {
+    font-size: 0.65rem;
+    border-radius: 5px;
+  }
+
+  .sc-weekday {
+    font-size: 0.55rem;
+  }
+
+  .sc-hero-number {
+    font-size: 1.8rem;
+  }
+
+  .sc-stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* =====================================================
+   REDUCED MOTION
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-container *,
+  .sc-container *::before,
+  .sc-container *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

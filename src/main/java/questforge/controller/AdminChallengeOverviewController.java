@@ -27,6 +27,6 @@ public class AdminChallengeOverviewController {
     @GetMapping
     public ResponseEntity<List<AdminChallengeOverviewDTO>> getChallengeOverview() {
         return ResponseEntity.ok(
-                adminChallengeOverviewService.getChallengeOverview());
+            adminChallengeOverviewService.getChallengeOverview());
     }
 }

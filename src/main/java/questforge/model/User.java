@@ -4,7 +4,6 @@ package questforge.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
@@ -12,8 +11,9 @@ import jakarta.validation.constraints.Size;
 @Table(
     name = "users",
     uniqueConstraints = {@UniqueConstraint(
-    name = "uk_users_email",
-    columnNames = {"email"})}
+        name = "uk_users_email",
+        columnNames = "email")
+    }
 )
 public class User {
 
@@ -22,29 +22,39 @@ public class User {
     private Long id;
 
     @NotBlank(message = "Name is required")
-    @Size(max = 100, message = "Name cannot exceed 100 characters")
+    @Size(max = 100)
     @Column(nullable = false, length = 100)
     private String name;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
-    @Pattern(
-        regexp = "^[A-Za-z0-9._%+-]+@gmail\\.com$",
-        message = "Email must be a valid @gmail.com address"
-    )
-    @Size(max = 254, message = "Email cannot exceed 254 characters")
-    @Column(nullable = false, unique = true, length = 254)
+    @Size(max = 254)
+    @Column(nullable = false, length = 254)
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(max = 255, message = "Password cannot exceed 255 characters")
     @Column(nullable = false, length = 255)
     private String password;
 
-    @NotBlank(message = "Role is required")
-    @Size(max = 30, message = "Role cannot exceed 30 characters")
+    public enum Role {
+        USER,
+        ADMIN,
+        EMPLOYEE;
+
+        public boolean matches(String string) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'matches'");
+        }
+
+        public String toUpperCase() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'toUpperCase'");
+        }
+    }
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private String role;
+    private Role role = Role.USER;
 
     @PositiveOrZero(message = "XP cannot be negative")
     @Column(nullable = false)
@@ -54,7 +64,7 @@ public class User {
     @Column(name = "profile_image", columnDefinition = "BYTEA")
     private byte[] profileImage;
 
-    @Size(max = 100, message = "Image content type cannot exceed 100 characters")
+    @Size(max = 100)
     @Column(name = "profile_image_content_type", length = 100)
     private String profileImageContentType;
 
@@ -89,11 +99,11 @@ public class User {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -117,8 +127,11 @@ public class User {
         return profileImageContentType;
     }
 
-    public void setProfileImageContentType(
-            String profileImageContentType) {
-        this.profileImageContentType = profileImageContentType;
+    public void setProfileImageContentType(String contentType) {
+        this.profileImageContentType = contentType;
+    }
+
+    public void setRole(String normalizedRole) {
+        this.id = id;
     }
 }

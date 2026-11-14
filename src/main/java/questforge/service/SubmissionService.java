@@ -208,7 +208,6 @@ public class SubmissionService {
                     user.getId(),
                     challenge.getDifficulty());
 
-            // Count this challenge toward the weekly quest once.
             weeklyQuestService.recordChallengeCompletion(user.getId());
 
             checkAchievements(user, savedSubmission);

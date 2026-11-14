@@ -1,12 +1,14 @@
 
 package questforge.dto;
 
+import questforge.model.User.Role;
+
 public class UserProfileDTO {
 
     private Long id;
     private String name;
     private String email;
-    private String role;
+    private Role role;
 
     private long totalAttempts;
     private long firstAttempts;
@@ -27,7 +29,7 @@ public class UserProfileDTO {
             Long id,
             String name,
             String email,
-            String role,
+            Role role,
             long totalAttempts,
             long firstAttempts,
             long practiceAttempts,
@@ -77,11 +79,11 @@ public class UserProfileDTO {
         this.email = email;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

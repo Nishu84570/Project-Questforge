@@ -1,39 +1,232 @@
+
+/* ==========================================
+   QUESTFORGE - GLOBAL DESIGN SYSTEM
+   Premium Light & Dark Theme
+   ========================================== */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+/* ==========================================
+   1. THEME VARIABLES
+   ========================================== */
+
 :root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Default Dark Theme */
   color-scheme: dark;
+
+  --bg-primary: #0b0b12;
+  --bg-secondary: #11111b;
+  --bg-tertiary: #181825;
+
+  --surface-primary: #141421;
+  --surface-secondary: #1b1b2b;
+  --surface-hover: #24243a;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #a1a1b5;
+  --text-muted: #717187;
+
+  --border-primary: rgba(255, 255, 255, 0.09);
+  --border-secondary: rgba(255, 255, 255, 0.15);
+
+  --accent-primary: #6366f1;
+  --accent-secondary: #8b5cf6;
+  --accent-hover: #818cf8;
+
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.35);
+
+  --card-bg: #141421;
+  --input-bg: #11111b;
+  --overlay-bg: rgba(0, 0, 0, 0.65);
+
+  --scrollbar-track: #11111b;
+  --scrollbar-thumb: #38384e;
+
+  --transition-theme: 0.25s ease;
 }
 
-* {
+/* ==========================================
+   2. LIGHT THEME
+   ========================================== */
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-primary: #f5f7fc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #edf0f8;
+
+  --surface-primary: #ffffff;
+  --surface-secondary: #f8f9fd;
+  --surface-hover: #eef0ff;
+
+  --text-primary: #17172a;
+  --text-secondary: #555a70;
+  --text-muted: #858ba0;
+
+  --border-primary: rgba(15, 23, 42, 0.09);
+  --border-secondary: rgba(15, 23, 42, 0.15);
+
+  --accent-primary: #5558e8;
+  --accent-secondary: #7c3aed;
+  --accent-hover: #4338ca;
+
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.07);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.10);
+
+  --card-bg: #ffffff;
+  --input-bg: #f8f9fd;
+  --overlay-bg: rgba(15, 23, 42, 0.35);
+
+  --scrollbar-track: #edf0f8;
+  --scrollbar-thumb: #c4c9d8;
+}
+
+/* ==========================================
+   3. GLOBAL RESET
+   ========================================== */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #0b0b10;
-  color: #f3f4f6;
-  min-height: 100vh;
-  overflow-x: hidden;
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+  background: var(--bg-primary);
+  color-scheme: inherit;
 }
 
-/* Custom Smooth Scrollbar for Elite SaaS Look */
+body {
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+
+  overflow-x: hidden;
+
+  transition:
+    background-color var(--transition-theme),
+    color var(--transition-theme);
+}
+
+/* ==========================================
+   4. GLOBAL ELEMENTS
+   ========================================== */
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+::selection {
+  background: rgba(99, 102, 241, 0.25);
+  color: var(--text-primary);
+}
+
+/* ==========================================
+   5. PREMIUM SCROLLBAR
+   ========================================== */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f0f17;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
   transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5);
+  background: var(--accent-primary);
+}
+
+/* Firefox */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* ==========================================
+   6. THEME TRANSITION
+   ========================================== */
+
+body,
+header,
+nav,
+main,
+aside,
+footer,
+section,
+article,
+.theme-toggle,
+input,
+textarea,
+select {
+  transition:
+    background-color var(--transition-theme),
+    border-color var(--transition-theme),
+    color var(--transition-theme);
+}
+
+/* ==========================================
+   7. ACCESSIBILITY
+   ========================================== */
+
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

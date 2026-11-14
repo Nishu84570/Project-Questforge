@@ -3,6 +3,7 @@ package questforge.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import questforge.model.User.Role;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class JwtService {
         this.expirationTime = expirationTime;
     }
 
-    public String generateToken(String email, String role) {
+    public String generateToken(String email, Role role) {
 
         Date now = new Date();
         Date expiration = new Date(

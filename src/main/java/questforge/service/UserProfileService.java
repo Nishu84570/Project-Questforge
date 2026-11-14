@@ -19,26 +19,25 @@ import java.util.Set;
 @Service
 public class UserProfileService {
 
-    private static final long MAX_IMAGE_SIZE = 5L * 1024L * 1024L;
+        private static final long MAX_IMAGE_SIZE = 5L * 1024L * 1024L;
 
-    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
+        private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
             "image/jpeg",
             "image/png",
             "image/webp"
-    );
+        );
 
-    private final UserRepository userRepository;
-    private final SubmissionRepository submissionRepository;
+        private final UserRepository userRepository;
+        private final SubmissionRepository submissionRepository;
 
-    public UserProfileService(
+        public UserProfileService(
             UserRepository userRepository,
             SubmissionRepository submissionRepository) {
 
-        this.userRepository = userRepository;
-        this.submissionRepository = submissionRepository;
-    }
+                this.userRepository = userRepository;
+                this.submissionRepository = submissionRepository;
+        }
 
-    // GET MY PROFILE
 
     @Transactional(readOnly = true)
     public UserProfileDTO getMyProfile(String email) {

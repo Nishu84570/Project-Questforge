@@ -58,24 +58,20 @@ public class AdminDashboardService {
         long totalAchievements = achievementRepository.count();
         long totalNotifications = notificationRepository.count();
 
-        // Total XP across users
         long totalXp = users.stream()
                 .mapToLong(this::getUserXp)
                 .sum();
 
-        // Average user XP
         double averageUserXp = users.stream()
                 .mapToLong(this::getUserXp)
                 .average()
                 .orElse(0.0);
 
-        // Average submission score
         double averageSubmissionScore = submissions.stream()
                 .mapToLong(Submission::getScore)
                 .average()
                 .orElse(0.0);
 
-        // Top user
         TopUserDTO topUser = users.stream()
                 .max(
                         Comparator.comparingLong(this::getUserXp)
@@ -93,7 +89,6 @@ public class AdminDashboardService {
                 )
                 .orElse(null);
 
-        // Most active challenge by submission count
         Map<Long, Long> submissionCounts = new HashMap<>();
 
         for (Submission submission : submissions) {
