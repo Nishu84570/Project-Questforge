@@ -638,4 +638,4 @@ GitHub: **[@Nishu84570](https://github.com/Nishu84570)**
 
 If you find QuestForge interesting, consider giving the repository a ⭐ on GitHub.
 
-**Built with ☕ Java + 🌱 Spring Boot + ⚛️ React + ⚡ Vite**
+**Built with ☕ Java + 🌱 Spring Boot
