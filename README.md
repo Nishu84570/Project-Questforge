@@ -87,33 +87,10 @@ QuestForge includes a dedicated administration system with:
 | 📦 Maven           | Dependency management & build  |
 | 🌐 REST API        | Frontend-backend communication |
 
-## Frontend
-
-| Technology | Purpose             |
-| ---------- | ------------------- |
-| ⚛️ React   | UI library          |
-| ⚡ Vite     | Frontend build tool |
-| 📦 npm     | Package management  |
-| 🎨 CSS     | Styling             |
-
----
 
 # 🏗️ Architecture
 
-QuestForge follows a **full-stack client-server architecture**.
-
 ```text
-┌─────────────────────────────────────────────┐
-│                  Frontend                   │
-│                                             │
-│              React + Vite                   │
-│                                             │
-│  Pages → Components → API Service           │
-└──────────────────────┬──────────────────────┘
-                       │
-                       │ HTTP / REST API
-                       │
-                       ▼
 ┌─────────────────────────────────────────────┐
 │                  Backend                    │
 │                                             │
@@ -127,7 +104,6 @@ QuestForge follows a **full-stack client-server architecture**.
 └─────────────────────────────────────────────┘
 ```
 
----
 
 # 📁 Project Structure
 ```text
@@ -337,89 +313,6 @@ QuestForge/
 │               │
 │               └── QuestforgeApplicationTests.java
 │
-├── questforge-frontend/
-│   │
-│   ├── src/
-│   │   │
-│   │   ├── components/
-│   │   │   ├── AchievementCard.jsx
-│   │   │   ├── AdminNotificationModal.jsx
-│   │   │   ├── AdminQuickLinks.jsx
-│   │   │   ├── AdminRoute.jsx
-│   │   │   ├── ChallengeCard.jsx
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── NotificationBell.jsx
-│   │   │   ├── ProtectedRoute.jsx
-│   │   │   ├── SubmissionCard.jsx
-│   │   │   └── ThemeToggle.jsx
-│   │   │
-│   │   ├── pages/
-│   │   │   ├── Achievements.jsx
-│   │   │   ├── AdminChallenges.jsx
-│   │   │   ├── AdminDashboard.jsx
-│   │   │   ├── AdminDashboardOverview.jsx
-│   │   │   ├── AdminDashboardStats.jsx
-│   │   │   ├── AdminNotifications.jsx
-│   │   │   ├── AdminSubmissions.jsx
-│   │   │   ├── AdminUsers.jsx
-│   │   │   ├── ChallengeAnalytics.jsx
-│   │   │   ├── Challenges.jsx
-│   │   │   ├── Home.jsx
-│   │   │   ├── Leaderboard.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── Notifications.jsx
-│   │   │   ├── Profile.jsx
-│   │   │   ├── Register.jsx
-│   │   │   ├── SolveChallenge.jsx
-│   │   │   ├── SubmissionResult.jsx
-│   │   │   └── Submissions.jsx
-│   │   │
-│   │   ├── styles/
-│   │   │   ├── AchievementCard.css
-│   │   │   ├── Achievements.css
-│   │   │   ├── AdminChallengeOverview.css
-│   │   │   ├── AdminDashboard.css
-│   │   │   ├── AdminDashboardAnalytics.css
-│   │   │   ├── AdminDashboardOverview.css
-│   │   │   ├── AdminNotificationLink.css
-│   │   │   ├── AdminNotifications.css
-│   │   │   ├── AdminQuickLinks.css
-│   │   │   ├── AdminSubmissions.css
-│   │   │   ├── AdminUsers.css
-│   │   │   ├── AdminUserSubmissions.css
-│   │   │   ├── ChallengeAnalytics.css
-│   │   │   ├── ChallengeCard.css
-│   │   │   ├── Challenges.css
-│   │   │   ├── Home.css
-│   │   │   ├── Leaderboard.css
-│   │   │   ├── Login.css
-│   │   │   ├── Navbar.css
-│   │   │   ├── NotificationBell.css
-│   │   │   ├── Notifications.css
-│   │   │   ├── Profile.css
-│   │   │   ├── Register.css
-│   │   │   ├── SolveChallenge.css
-│   │   │   ├── Streak.css
-│   │   │   ├── StreakCalendar.css
-│   │   │   ├── SubmissionCard.css
-│   │   │   ├── SubmissionResult.css
-│   │   │   ├── Submissions.css
-│   │   │   └── ThemeToggle.css
-│   │   │
-│   │   ├── services/
-│   │   │   └── api.js
-│   │   │
-│   │   ├── utils/
-│   │   │   └── auth.js
-│   │   │
-│   │   ├── App.jsx
-│   │   ├── index.css
-│   │   └── main.jsx
-│   │
-│   ├── index.html
-│   ├── package-lock.json
-│   ├── package.json
-│   └── vite.config.js
 │
 ├── .gitignore
 ├── pom.xml
@@ -434,22 +327,12 @@ Make sure the following are installed:
 
 * ☕ Java JDK
 * 📦 Maven or Maven Wrapper
-* 🟢 Node.js
-* 📦 npm
 * 🔧 Git
 
 Check your installations:
 
 ```bash
 java -version
-```
-
-```bash
-node -v
-```
-
-```bash
-npm -v
 ```
 
 ```bash
@@ -494,36 +377,6 @@ From the project root:
 
 The backend will start on the port configured in the Spring Boot application.
 
----
-
-# 🎨 Frontend Setup
-
-Open a new terminal.
-
-Navigate to the frontend:
-
-```bash
-cd questforge-frontend
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-Vite will display the local development URL in the terminal.
-
-Open the displayed URL in your browser.
-
----
-
 # 🔐 Authentication Flow
 
 QuestForge uses JWT-based authentication.
@@ -561,19 +414,6 @@ Spring Security
 Authorized Resource
 ```
 
-Protected frontend routes are handled through:
-
-```text
-ProtectedRoute.jsx
-```
-
-Administrative routes are protected through:
-
-```text
-AdminRoute.jsx
-```
-
----
 
 # 🧩 Core Backend Architecture
 
@@ -629,8 +469,6 @@ Provides centralized exception handling through:
 ```text
 GlobalExceptionHandler
 ```
-
----
 
 # 🌐 API
 
